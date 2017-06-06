@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "digest-sha3", "~> 1.1"
-  spec.add_dependency "power-types", "~> 0.2.0"
+  spec.add_dependency "power-types", "~> 0.1"
   spec.add_dependency "activesupport"
 
   spec.add_development_dependency "bundler", "~> 1.12"

@@ -1,12 +1,17 @@
 module Etherlite
   class Connection
+    def initialize(_uri)
+      @uri = _uri
+    end
+
     def ipc_call(_method, *_params)
       id = new_unique_id
       payload = { jsonrpc: "2.0", method: _method, params: _params, id: id }
 
-      Net::HTTP.start(server_uri.hostname, server_uri.port) do |http|
+      # TODO: support ipc
+      Net::HTTP.start(@uri.hostname, @uri.port) do |http|
         return handle_response http.post(
-          server_uri.path || '/',
+          @uri.path || '/',
           payload.to_json,
           "Content-Type" => "application/json"
         ), id
@@ -14,10 +19,6 @@ module Etherlite
     end
 
     private
-
-    def server_uri
-      URI('http://localhost:8545/')
-    end
 
     def new_unique_id
       (Time.now.to_f * 1000.0).to_i

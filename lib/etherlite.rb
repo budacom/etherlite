@@ -24,6 +24,7 @@ require "etherlite/contract/event_base"
 require "etherlite/contract/event_input"
 require "etherlite/contract/function"
 
+require "etherlite/configuration"
 require "etherlite/abi"
 require "etherlite/utils"
 require "etherlite/connection"
@@ -38,14 +39,28 @@ module Etherlite
     Utils.valid_address? _value
   end
 
-  def self.connect(_host, _port) # connect to specific socket/host/port/
-    Client.new
+  def self.connect(_url)
+    _url = URI(_url) unless _url.is_a? URI
+
+    Client.new Connection.new(_url)
+  end
+
+  def self.config
+    @config ||= Configuration.new
+  end
+
+  def self.logger
+    config.logger
+  end
+
+  def self.configure(_options = nil, &_block)
+    config.assign_attributes(_options) unless _options.nil?
+    _block.call(config) unless _block.nil?
   end
 
   def self.connection
-    @connection ||= begin
-      # TODO: extract default connection options from somewhere...
-      Connection.new
-    end
+    @connection ||= Connection.new URI(config.url)
   end
 end
+
+require "etherlite/railtie" if defined? Rails

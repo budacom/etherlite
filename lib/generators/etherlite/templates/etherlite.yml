@@ -1,0 +1,11 @@
+defaults:
+  contract_path: 'contracts'
+
+development: &defaults
+  url: 'http://127.0.0.1:8545'
+
+test: &defaults
+  url: 'http://127.0.0.1:8545'
+
+production: &defaults
+  url: 'http://127.0.0.1:8545'
