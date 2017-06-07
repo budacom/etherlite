@@ -43,7 +43,7 @@ module Etherlite::Contract
       logs.map do |log|
         event = event_map[log["topics"].first]
         # TODO: support anonymous events!
-        Etherlite::Commands::DecodeEventLog.for(event: event, raw_log: log) unless event.nil?
+        event.decode(@connection, log) unless event.nil?
       end
     end
 
