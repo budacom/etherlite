@@ -11,7 +11,7 @@ module Etherlite
       # TODO: support ipc
       Net::HTTP.start(@uri.hostname, @uri.port) do |http|
         return handle_response http.post(
-          @uri.path || '/',
+          @uri.path.empty? ? '/' : @uri.path,
           payload.to_json,
           "Content-Type" => "application/json"
         ), id
