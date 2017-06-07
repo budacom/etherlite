@@ -4,8 +4,8 @@ module Etherlite
 
     attr_reader :connection
 
-    def initialize
-      @connection = Connection.new
+    def initialize(_connection)
+      @connection = _connection
     end
   end
 end
