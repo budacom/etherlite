@@ -37,10 +37,10 @@ module Etherlite
         data: _function.encode(_params)
       }
 
-      if _signature.constant?
-        _function.decode @connection.ipc_call(:eth_call, params, "latest")
+      if _function.constant?
+        _function.decode @connection, @connection.ipc_call(:eth_call, params, "latest")
       else
-        if _signature.payable? && options.key?(:pay)
+        if _function.payable? && options.key?(:pay)
           params[:value] = Utils.encode_quantity_param options[:pay]
         end
 
