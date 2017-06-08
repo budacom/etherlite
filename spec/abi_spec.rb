@@ -67,7 +67,7 @@ describe Etherlite::Abi do
     end
 
     context "given an instance of the contract with a default account" do
-      let(:address) { 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' }
+      let(:address) { '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' }
       let(:account) { Etherlite::Account.new(nil, nil) }
       let(:instance) { contract.at address, as: account }
 

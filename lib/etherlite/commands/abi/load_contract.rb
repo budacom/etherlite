@@ -52,7 +52,7 @@ module Etherlite::Abi
 
       event_class = Class.new(Etherlite::Contract::EventBase) do
         event_inputs.each do |input|
-          define_method(input.name) { attributes[input.name] }
+          define_method(input.name) { attributes[input.original_name] }
         end
       end
 

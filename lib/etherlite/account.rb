@@ -19,7 +19,7 @@ module Etherlite
 
     def send_to(_target, _options = {})
       params = {
-        from: '0x' + @normalized_address,
+        from: json_encoded_address,
         to: Utils.encode_address_param(_target),
         value: Utils.encode_quantity_param(_options[:amount] || 0)
       }
@@ -32,7 +32,7 @@ module Etherlite
       options = _params.last.is_a?(Hash) ? _params.pop : {}
 
       params = {
-        from: '0x' + @normalized_address,
+        from: json_encoded_address,
         to: Utils.encode_address_param(_target),
         data: _function.encode(_params)
       }

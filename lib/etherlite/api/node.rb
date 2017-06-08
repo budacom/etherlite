@@ -2,6 +2,7 @@ module Etherlite
   module Api
     module Node
       extend Forwardable
+      include Address
 
       def get_block_number
         Etherlite::Utils.hex_to_uint connection.ipc_call(:eth_blockNumber)
@@ -30,7 +31,7 @@ module Etherlite
         @first_account ||= accounts.first
       end
 
-      def_delegators :first_account, :unlock, :lock, :get_balance, :send_to, :call
+      def_delegators :first_account, :unlock, :lock, :normalized_address, :send_to, :call
     end
   end
 end

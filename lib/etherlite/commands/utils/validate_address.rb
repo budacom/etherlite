@@ -1,6 +1,6 @@
 module Etherlite::Utils
   class ValidateAddress < PowerTypes::Command.new(:address)
-    MATCHER = /^(0x)?[0-9a-fA-F]{40}$/
+    MATCHER = /^0x[0-9a-fA-F]{40}$/
 
     def perform
       return false unless MATCHER === @address

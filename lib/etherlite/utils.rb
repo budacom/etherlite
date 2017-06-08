@@ -38,8 +38,8 @@ module Etherlite
     end
 
     def normalize_address_param(_value)
-      if _value.respond_to? :address
-        _value.address
+      if _value.respond_to? :normalized_address
+        _value.normalized_address
       else
         _value = _value.to_s
         raise ArgumentError, 'invalid address' unless valid_address? _value

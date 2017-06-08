@@ -30,7 +30,7 @@ module Etherlite::Contract
 
     def get_logs(events: nil, from_block: :earliest, to_block: :latest)
       params = {
-        address: '0x' + @normalized_address,
+        address: json_encoded_address,
         fromBlock: Etherlite::Utils.encode_block_param(from_block),
         toBlock: Etherlite::Utils.encode_block_param(to_block)
       }
