@@ -17,11 +17,11 @@ module Etherlite
       @passphrase = nil
     end
 
-    def send_to(_target, _options = {})
+    def transfer_to(_target, _options = {})
       params = {
         from: json_encoded_address,
         to: Utils.encode_address_param(_target),
-        value: Utils.encode_quantity_param(_options[:amount] || 0)
+        value: Utils.encode_quantity_param(_options.fetch(:amount, 0))
       }
 
       send_transaction params, _options

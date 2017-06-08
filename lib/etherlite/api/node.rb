@@ -31,7 +31,7 @@ module Etherlite
         @first_account ||= accounts.first
       end
 
-      def_delegators :first_account, :unlock, :lock, :normalized_address, :send_to, :call
+      def_delegators :first_account, :unlock, :lock, :normalized_address, :transfer_to, :call
     end
   end
 end
