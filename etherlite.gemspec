@@ -21,6 +21,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "digest-sha3", "~> 1.1"
   spec.add_dependency "power-types", "~> 0.1"
+  spec.add_dependency "eth", "~> 0.4.4"
   spec.add_dependency "activesupport"
 
   spec.add_development_dependency "bundler", "~> 1.12"
