@@ -31,26 +31,42 @@ module Etherlite
       _function = Utils.parse_function(_function) unless _function.is_a? Contract::Function
       options = _params.last.is_a?(Hash) ? _params.pop : {}
 
-      params = {
-        from: json_encoded_address,
-        to: Utils.encode_address_param(_target),
-        data: _function.encode(_params)
-      }
-
       if _function.constant?
-        _function.decode @connection, @connection.ipc_call(:eth_call, params, "latest")
+        call_constant _target, _function, _params, options
       else
-        if _function.payable? && options.key?(:pay)
-          params[:value] = Utils.encode_quantity_param options[:pay]
-        end
-
-        send_transaction params, options
+        send_function_transaction _target, _function, _params, options
       end
     end
 
     private
 
     attr_reader :normalized_address
+
+    def call_constant(_target, _function, _params, _options)
+      ipc_params = {
+        from: json_encoded_address,
+        to: Utils.encode_address_param(_target),
+        data: _function.encode(_params)
+      }
+
+      block = Utils.encode_block_param _options.fetch(:block, :latest)
+
+      _function.decode @connection, @connection.ipc_call(:eth_call, ipc_params, block)
+    end
+
+    def send_function_transaction(_target, _function, _params, _options)
+      ipc_params = {
+        from: json_encoded_address,
+        to: Utils.encode_address_param(_target),
+        data: _function.encode(_params)
+      }
+
+      value = _options.fetch(:pay, 0)
+      raise 'function is not payable' if value > 0 && !_function.payable?
+      ipc_params[:value] = value
+
+      send_transaction(ipc_params, _options)
+    end
 
     def send_transaction(_params, _opt)
       _params[:gas] = Utils.encode_quantity_param(_opt[:gas]) if _opt.key? :gas
