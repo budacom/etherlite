@@ -11,13 +11,14 @@ module Etherlite::Contract
     end
 
     def self.at(_address, client: nil, as: nil)
-      client ||= ::Etherlite # use default client if no client is provided
+      _address = Etherlite::Utils.normalize_address_param _address
 
-      new(
-        client.connection,
-        Etherlite::Utils.normalize_address_param(_address),
-        as || client.first_account
-      )
+      if as
+        new(as.connection, _address, as)
+      else
+        client ||= ::Etherlite
+        new(client.connection, _address, client.first_account)
+      end
     end
 
     attr_reader :connection
