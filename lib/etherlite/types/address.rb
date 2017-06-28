@@ -10,7 +10,7 @@ module Etherlite::Types
 
     def encode(_value)
       _value = Etherlite::Utils.normalize_address_param _value
-      _value.to_raw_hex.rjust(64, '0')
+      _value.rjust(64, '0')
     end
 
     def decode(_connection, _value)
