@@ -31,6 +31,10 @@ module Etherlite
         @first_account ||= accounts.first
       end
 
+      def account_from_pk(_pk)
+        Etherlite::PkAccount.new(connection, _pk)
+      end
+
       def_delegators :first_account, :unlock, :lock, :normalized_address, :transfer_to, :call
     end
   end
