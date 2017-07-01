@@ -73,11 +73,13 @@ module Etherlite
       _params[:gasPrice] = Utils.encode_quantity_param(_opt[:gas_price]) if _opt.key? :gas_price
 
       passphrase = _opt.fetch(:passphrase, @passphrase)
-      if passphrase.nil?
-        @connection.ipc_call(:eth_sendTransaction, _params)
-      else
-        @connection.ipc_call(:personal_sendTransaction, _params, passphrase)
-      end
+      tx_hash = if passphrase.nil?
+                  @connection.ipc_call(:eth_sendTransaction, _params)
+                else
+                  @connection.ipc_call(:personal_sendTransaction, _params, passphrase)
+                end
+
+      Transaction.new @connection, tx_hash
     end
   end
 end

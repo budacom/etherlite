@@ -52,7 +52,7 @@ module Etherlite
     end
 
     def send_transaction(_value, _hex_data, _hex_address, _opt)
-      nonce_manager.with_next_nonce_for(@key.address) do |nonce|
+      tx_hash = nonce_manager.with_next_nonce_for(@key.address) do |nonce|
         tx = Eth::Tx.new(
           value: _value,
           data: _hex_data,
@@ -66,6 +66,8 @@ module Etherlite
 
         @connection.ipc_call(:eth_sendRawTransaction, tx.hex)
       end
+
+      Transaction.new @connection, tx_hash
     end
 
     def gas_price
