@@ -9,7 +9,7 @@ module Etherlite
       payload = { jsonrpc: "2.0", method: _method, params: _params, id: id }
 
       # TODO: support ipc
-      Net::HTTP.start(@uri.hostname, @uri.port) do |http|
+      Net::HTTP.start(@uri.hostname, @uri.port, use_ssl: use_ssl?) do |http|
         return handle_response http.post(
           @uri.path.empty? ? '/' : @uri.path,
           payload.to_json,
@@ -22,6 +22,10 @@ module Etherlite
 
     def new_unique_id
       (Time.now.to_f * 1000.0).to_i
+    end
+
+    def use_ssl?
+      @uri.scheme == 'https'
     end
 
     def handle_response(_response, _id)
