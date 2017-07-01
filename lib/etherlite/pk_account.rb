@@ -52,23 +52,29 @@ module Etherlite
     end
 
     def send_transaction(_value, _hex_data, _hex_address, _opt)
-      tx = Eth::Tx.new(
-        value: _value,
-        data: _hex_data,
-        gas_limit: _opt.fetch(:gas, 90_000),
-        gas_price: _opt.fetch(:gas_price, gas_price),
-        to: _hex_address,
-        nonce: 0
-      )
+      nonce_manager.with_next_nonce_for(@key.address) do |nonce|
+        tx = Eth::Tx.new(
+          value: _value,
+          data: _hex_data,
+          gas_limit: _opt.fetch(:gas, 90_000),
+          gas_price: _opt.fetch(:gas_price, gas_price),
+          to: _hex_address,
+          nonce: nonce
+        )
 
-      tx.sign @key
+        tx.sign @key
 
-      @connection.ipc_call(:eth_sendRawTransaction, tx.hex)
+        @connection.ipc_call(:eth_sendRawTransaction, tx.hex)
+      end
     end
 
     def gas_price
       # TODO: improve on this
       @gas_price ||= Etherlite::Utils.hex_to_uint @connection.ipc_call(:eth_gasPrice)
+    end
+
+    def nonce_manager
+      NonceManager.new @connection
     end
   end
 end
