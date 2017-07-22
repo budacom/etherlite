@@ -31,12 +31,11 @@ module Etherlite
     def handle_response(_response, _id)
       case _response
       when Net::HTTPSuccess
-        # puts _response.body
         json_body = JSON.parse _response.body
-        # TODO: check id
+        raise NodeError.new json_body['error'] if json_body['error']
         json_body['result']
       else
-        raise _response
+        raise RPCError.new _response.code, _response.body
       end
     end
   end
