@@ -20,7 +20,7 @@ module Etherlite::Abi
       when 'fixed'    then Etherlite::Types::Fixed.new(true, b1_128(_parts), b2_128(_parts))
       when 'string'   then Etherlite::Types::String.new
       when 'address'  then Etherlite::Types::Address.new
-      when 'bool'     then Etherlite::Types::Bool.new
+      when 'bool'     then Etherlite::Types::Boolean.new
       when 'bytes'
         if _parts[:b1].present?
           Etherlite::Types::Bytes.new(_parts[:b1].to_i)

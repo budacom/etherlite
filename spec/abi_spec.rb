@@ -99,7 +99,7 @@ describe Etherlite::Abi do
       expect(function.name).to eq 'baz'
       expect(function.args.count).to eq 2
       expect(function.args[0]).to be_a(Etherlite::Types::Integer)
-      expect(function.args[1]).to be_a(Etherlite::Types::Bool)
+      expect(function.args[1]).to be_a(Etherlite::Types::Boolean)
     end
 
     it "properly sets the constant attribute" do
