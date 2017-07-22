@@ -25,8 +25,10 @@ module Etherlite
       _hex_value.hex
     end
 
-    def hex_to_int(_hex_value)
-      # TODO.
+    def hex_to_int(_hex_value, bytes: 32)
+      value = _hex_value.hex
+      top_bit = (1 << (bytes * 8 - 1))
+      value & top_bit > 0 ? (value - 2 * top_bit) : value
     end
 
     def valid_address?(_address)
