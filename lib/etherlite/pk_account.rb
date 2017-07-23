@@ -39,6 +39,8 @@ module Etherlite
 
     private
 
+    @@eth_mutex = Mutex.new
+
     def call_constant(_target, _function, _params, _options)
       ipc_params = {
         from: json_encoded_address,
@@ -51,24 +53,31 @@ module Etherlite
       _function.decode @connection, @connection.ipc_call(:eth_call, ipc_params, block)
     end
 
-    def send_transaction(_value, _hex_data, _hex_address, _opt)
-      tx_hash = nonce_manager.with_next_nonce_for(@key.address) do |nonce|
+    # rubocop:disable Metrics/MethodLength
+    def send_transaction(_value, _hex_data, _hex_address, _options)
+      tx_hash = nonce_manager.with_next_nonce_for(normalized_address) do |nonce|
         tx = Eth::Tx.new(
           value: _value,
           data: _hex_data,
-          gas_limit: _opt.fetch(:gas, 90_000),
-          gas_price: _opt.fetch(:gas_price, gas_price),
+          gas_limit: _options.fetch(:gas, 90_000),
+          gas_price: _options.fetch(:gas_price, gas_price),
           to: _hex_address,
           nonce: nonce
         )
 
-        tx.sign @key
+        # Since eth gem does not allow configuration of chains for every tx, we need
+        # to globally configure it before signing. This is not thread safe so a mutex is needed.
+        @@eth_mutex.synchronize do
+          Eth.configure { |c| c.chain_id = @connection.chain_id }
+          tx.sign @key
+        end
 
         @connection.ipc_call(:eth_sendRawTransaction, tx.hex)
       end
 
       Transaction.new @connection, tx_hash
     end
+    # rubocop:enable Metrics/MethodLength
 
     def gas_price
       # TODO: improve on this

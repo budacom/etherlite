@@ -1,7 +1,10 @@
 module Etherlite
   class Connection
-    def initialize(_uri)
+    attr_reader :chain_id
+
+    def initialize(_uri, chain_id: nil)
       @uri = _uri
+      @chain_id = chain_id
     end
 
     def ipc_call(_method, *_params)
