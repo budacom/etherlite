@@ -22,7 +22,7 @@ module Etherlite
     end
 
     def call(_target, _function, *_params)
-      _function = Utils.parse_function(_function) unless _function.is_a? Contract::Function
+      _function = parse_function(_function) if _function.is_a? String
       options = _params.last.is_a?(Hash) ? _params.pop : {}
 
       if _function.constant?
@@ -50,12 +50,11 @@ module Etherlite
 
       block = Utils.encode_block_param _options.fetch(:block, :latest)
 
-      _function.decode @connection, @connection.ipc_call(:eth_call, ipc_params, block)
+      _function.decode @connection, @connection.eth_call(ipc_params, block)
     end
 
-    # rubocop:disable Metrics/MethodLength
     def send_transaction(_value, _hex_data, _hex_address, _options)
-      tx_hash = nonce_manager.with_next_nonce_for(normalized_address) do |nonce|
+      nonce_manager.with_next_nonce_for(normalized_address) do |nonce|
         tx = Eth::Tx.new(
           value: _value,
           data: _hex_data,
@@ -67,25 +66,30 @@ module Etherlite
 
         # Since eth gem does not allow configuration of chains for every tx, we need
         # to globally configure it before signing. This is not thread safe so a mutex is needed.
-        @@eth_mutex.synchronize do
-          Eth.configure { |c| c.chain_id = @connection.chain_id }
-          tx.sign @key
-        end
+        sign_with_connection_chain tx
 
-        @connection.ipc_call(:eth_sendRawTransaction, tx.hex)
+        Transaction.new @connection, @connection.eth_send_raw_transaction(tx.hex)
       end
-
-      Transaction.new @connection, tx_hash
     end
-    # rubocop:enable Metrics/MethodLength
 
     def gas_price
       # TODO: improve on this
-      @gas_price ||= Etherlite::Utils.hex_to_uint @connection.ipc_call(:eth_gasPrice)
+      @gas_price ||= connection.eth_gas_price
     end
 
     def nonce_manager
       NonceManager.new @connection
+    end
+
+    def sign_with_connection_chain(_tx)
+      @@eth_mutex.synchronize do
+        Eth.configure { |c| c.chain_id = @connection.chain_id }
+        _tx.sign @key
+      end
+    end
+
+    def parse_function(_signature)
+      Abi::LoadFunction.for signature: _signature
     end
   end
 end

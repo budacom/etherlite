@@ -28,7 +28,7 @@ module Etherlite
     end
 
     def call(_target, _function, *_params)
-      _function = Utils.parse_function(_function) unless _function.is_a? Contract::Function
+      _function = parse_function(_function) if _function.is_a? String
       options = _params.last.is_a?(Hash) ? _params.pop : {}
 
       if _function.constant?
@@ -80,6 +80,10 @@ module Etherlite
                 end
 
       Transaction.new @connection, tx_hash
+    end
+
+    def parse_function(_signature)
+      Abi::LoadFunction.for signature: _signature
     end
   end
 end

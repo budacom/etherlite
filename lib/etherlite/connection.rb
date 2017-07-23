@@ -1,5 +1,7 @@
 module Etherlite
   class Connection
+    include Api::Rpc
+
     attr_reader :chain_id
 
     def initialize(_uri, chain_id: nil)

@@ -6,6 +6,7 @@ require "etherlite/version"
 
 require "etherlite/api/address"
 require "etherlite/api/node"
+require "etherlite/api/rpc"
 
 require "etherlite/types/base"
 require "etherlite/types/address"

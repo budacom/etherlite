@@ -5,15 +5,11 @@ module Etherlite
       include Address
 
       def get_block_number
-        Etherlite::Utils.hex_to_uint connection.ipc_call(:eth_blockNumber)
+        connection.eth_block_number
       end
 
       def get_gas_price
-        Etherlite::Utils.hex_to_uint connection.ipc_call(:eth_gasPrice)
-      end
-
-      def get_transaction_receipt(_tx_hash)
-        connection.ipc_call(:eth_getTransactionReceipt, _tx_hash)
+        connection.eth_gas_price
       end
 
       def register_account(_passphrase)
