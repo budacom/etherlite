@@ -2,10 +2,11 @@ module Etherlite
   class Configuration
     DEFAULTS = {
       url: 'http://127.0.0.1:8545',
+      chain_id: nil, # any chain
       logger: nil # set by method
     }
 
-    attr_accessor :url, :logger
+    attr_accessor :url, :chain_id, :logger
 
     def initialize
       assign_attributes DEFAULTS
