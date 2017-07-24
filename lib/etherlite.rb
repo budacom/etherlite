@@ -44,10 +44,10 @@ module Etherlite
     Utils.valid_address? _value
   end
 
-  def self.connect(_url, chain_id: nil)
+  def self.connect(_url, _options = {})
     _url = URI(_url) unless _url.is_a? URI
 
-    Client.new Connection.new(_url, chain_id)
+    Client.new Connection.new(_url, _options.fetch(:chain_id, config.chain_id))
   end
 
   def self.config
