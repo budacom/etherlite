@@ -68,7 +68,7 @@ describe Etherlite::Abi do
 
     context "given an instance of the contract with a default account" do
       let(:address) { '0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' }
-      let(:account) { Etherlite::Account.new(nil, nil) }
+      let(:account) { Etherlite::Account::Local.new(nil, nil) }
       let(:instance) { contract.at address, as: account }
 
       it "provides contract methods for each function" do

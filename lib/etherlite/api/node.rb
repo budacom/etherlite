@@ -14,24 +14,31 @@ module Etherlite
 
       def register_account(_passphrase)
         address = connection.ipc_call(:personal_newAccount, _passphrase)
-        Etherlite::Account.new @connection, Etherlite::Utils.normalize_address(address)
+        Etherlite::Account::Local.new @connection, Etherlite::Utils.normalize_address(address)
       end
 
       def accounts
         connection.ipc_call(:eth_accounts).map do |address|
-          Etherlite::Account.new @connection, Etherlite::Utils.normalize_address(address)
+          Etherlite::Account::Local.new @connection, Etherlite::Utils.normalize_address(address)
         end
       end
 
-      def first_account
-        @first_account ||= accounts.first
+      def default_account
+        @default_account ||= load_default_account
       end
 
       def account_from_pk(_pk)
-        Etherlite::PkAccount.new(connection, _pk)
+        Etherlite::Account::PrivateKey.new connection, _pk
       end
 
-      def_delegators :first_account, :unlock, :lock, :normalized_address, :transfer_to, :call
+      def_delegators :default_account, :unlock, :lock, :normalized_address, :transfer_to, :call
+
+      private
+
+      def load_default_account
+        # TODO: consider configuring a global PK and allow the default account to use it
+        accounts.first || Etherlite::Account::Anonymous.new(connection)
+      end
     end
   end
 end

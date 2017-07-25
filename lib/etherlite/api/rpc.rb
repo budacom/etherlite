@@ -24,6 +24,14 @@ module Etherlite
       def eth_send_raw_transaction(_hex_data)
         ipc_call(:eth_sendRawTransaction, _hex_data)
       end
+
+      def eth_send_transaction(_params)
+        ipc_call(:eth_sendTransaction, _params)
+      end
+
+      def personal_send_transaction(_params, _passphrase)
+        ipc_call(:personal_sendTransaction, _params, _passphrase)
+      end
     end
   end
 end

@@ -20,4 +20,6 @@ module Etherlite
       @rpc_error_message = _error['message']
     end
   end
+
+  class NotSupportedError < Error; end
 end
