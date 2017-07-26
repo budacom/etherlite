@@ -32,6 +32,24 @@ module Etherlite
       def personal_send_transaction(_params, _passphrase)
         ipc_call(:personal_sendTransaction, _params, _passphrase)
       end
+
+      # TestRPC support
+
+      def evm_snapshot
+        ipc_call(:evm_snapshot)
+      end
+
+      def evm_revert(_snapshot_id)
+        ipc_call(:evm_revert, _snapshot_id)
+      end
+
+      def evm_increase_time(_seconds)
+        Etherlite::Utils.hex_to_uint ipc_call(:evm_increase_time, _seconds)
+      end
+
+      def evm_mine
+        ipc_call(:evm_mine)
+      end
     end
   end
 end
