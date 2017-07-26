@@ -13,5 +13,11 @@ module Etherlite::Types
 
       Etherlite::Utils.uint_to_hex(bytes) + bytes_as_hex.ljust(padded_size * 2, '0')
     end
+
+    def decode(_connection, _value)
+      size = Etherlite::Utils.hex_to_uint _value[0...64]
+
+      [_value[64...64 + size * 2]].pack('H*')
+    end
   end
 end
