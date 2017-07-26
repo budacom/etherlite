@@ -22,4 +22,6 @@ module Etherlite
   end
 
   class NotSupportedError < Error; end
+
+  class UnlinkedContractError < Error; end
 end

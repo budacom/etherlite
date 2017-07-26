@@ -10,6 +10,25 @@ module Etherlite::Contract
       @events ||= []
     end
 
+    def self.binary
+      @binary ||= begin
+        if /__[^_]+_+/ === unlinked_binary
+          raise UnlinkedContractError, 'compiled contract contains unresolved library references'
+        end
+
+        unlinked_binary
+      end
+    end
+
+    def self.deploy(_options = {})
+      account = _options[:as] || _options[:client].default_account
+
+      tx = account.send_transaction({ data: binary }.merge(_options))
+      if tx.wait_for_block(timeout: _options.fetch(:timeout, 120))
+        at tx.contract_address, as: account
+      end
+    end
+
     def self.at(_address, client: nil, as: nil)
       _address = Etherlite::Utils.normalize_address_param _address
 
@@ -17,7 +36,7 @@ module Etherlite::Contract
         new(as.connection, _address, as)
       else
         client ||= ::Etherlite
-        new(client.connection, _address, client.first_account)
+        new(client.connection, _address, client.default_account)
       end
     end
 
