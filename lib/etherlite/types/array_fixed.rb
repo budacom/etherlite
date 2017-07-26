@@ -1,23 +1,32 @@
 module Etherlite::Types
-  class ArrayFixed < ArrayBase
-    def initialize(_subtype, _size)
-      super _subtype
-      @size = _size
+  class ArrayFixed < Base
+    attr_reader :length, :subtype
+
+    def initialize(_subtype, _length)
+      raise ArgumentError, 'An array can not contain a dynamic type' if _subtype.dynamic?
+
+      @subtype = _subtype
+      @length = _length
     end
 
     def signature
-      "#{subtype.signature}[#{@size}]"
+      "#{@subtype.signature}[#{@length}]"
     end
 
     def size
-      subtype.size * @size
+      return nil if @subtype.dynamic?
+      @subtype.size * @length
     end
 
-    def encode(_value)
-      raise ArgumentError, "expected an array for #{signature}" unless _value.is_a? Array
-      raise ArgumentError, "expected array of size #{@size}" unless _value.size == @size
+    def encode(_values)
+      raise ArgumentError, "expected an array for #{signature}" unless _values.is_a? Array
+      raise ArgumentError, "expected array of length #{@length}" unless _values.length == @length
 
-      encode_values _value
+      Etherlite::Support::Array.encode([@subtype] * @length, _values)
+    end
+
+    def decode(_connection, _data)
+      Etherlite::Support::Array.decode(_connection, [@subtype] * @length, _data)
     end
   end
 end

@@ -8,9 +8,10 @@ require "etherlite/api/address"
 require "etherlite/api/node"
 require "etherlite/api/rpc"
 
+require "etherlite/support/array"
+
 require "etherlite/types/base"
 require "etherlite/types/address"
-require "etherlite/types/array_base"
 require "etherlite/types/array_dynamic"
 require "etherlite/types/array_fixed"
 require "etherlite/types/boolean"
