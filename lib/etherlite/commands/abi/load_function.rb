@@ -6,16 +6,16 @@ module Etherlite::Abi
       parts = MATCHER.match @signature
       raise ArgumentError, 'invalid method signature' if parts.nil?
 
-      args = parts[3].split(',').map { |a| LoadType.for(signature: a.strip) }
+      inputs = parts[3].split(',').map { |a| LoadType.for(signature: a.strip) }
 
       case parts[1]
       when 'payable'
-        build parts[2], args, payable: true
+        build parts[2], inputs, [], true, false
       when 'onchain'
-        build parts[2], args
+        build parts[2], inputs, [], false, false
       else
-        return_type = parts[1] == 'void' ? nil : LoadType.for(signature: parts[1])
-        build parts[2], args, constant: true, returns: return_type
+        ouputs = parts[1] == 'void' ? [] : [LoadType.for(signature: parts[1])]
+        build parts[2], inputs, ouputs, false, true
       end
     end
 

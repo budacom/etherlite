@@ -1,16 +1,17 @@
 require 'etherlite/commands/contract/function/encode_arguments'
+require 'etherlite/commands/contract/function/decode_arguments'
 
 module Etherlite::Contract
   class Function
-    attr_reader :name, :args
+    attr_reader :name, :inputs, :outputs
 
-    def initialize(_name, _args, returns: nil, payable: false, constant: false)
+    def initialize(_name, _inputs, _outputs, _payable, _constant)
       @name = _name
-      @args = _args
+      @inputs = _inputs
+      @outputs = _outputs
 
-      @returns = returns
-      @payable = payable
-      @constant = constant
+      @payable = _payable
+      @constant = _constant
     end
 
     def constant?
@@ -23,21 +24,23 @@ module Etherlite::Contract
 
     def signature
       @signature ||= begin
-        arg_signatures = @args.map &:signature
+        arg_signatures = @inputs.map &:signature
         "#{@name}(#{arg_signatures.join(',')})"
       end
     end
 
     def encode(_values)
       signature_hash = Etherlite::Utils.sha3 signature
-      encoded_args = EncodeArguments.for subtypes: @args, values: _values
+      encoded_inputs = EncodeArguments.for subtypes: @inputs, values: _values
 
-      '0x' + signature_hash[0..7] + encoded_args
+      '0x' + signature_hash[0..7] + encoded_inputs
     end
 
-    def decode(_connection, _values)
-      # TODO: decode return values
-      _values
+    def decode(_connection, _data)
+      return nil if @outputs.empty?
+
+      result = DecodeArguments.for connection: _connection, subtypes: @outputs, hex_data: _data
+      result.length > 1 ? result : result[0]
     end
   end
 end

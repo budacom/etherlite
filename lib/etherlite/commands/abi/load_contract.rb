@@ -3,6 +3,8 @@ module Etherlite::Abi
     def perform
       klass = Class.new(Etherlite::Contract::Base)
 
+      define_class_methods klass
+
       abi_definitions.each do |definition|
         case definition['type']
         when 'function'
@@ -24,17 +26,11 @@ module Etherlite::Abi
     end
 
     def define_function(_class, _definition)
-      function_args = _definition['inputs'].map { |input| LoadType.for signature: input['type'] }
-      function = Etherlite::Contract::Function.new(
-        _definition['name'],
-        function_args,
-        payable: _definition['payable'],
-        constant: _definition['constant']
-      )
+      function = build_function_from_definition _definition
 
       _class.functions << function
       _class.class_eval do
-        define_method(_definition['name'].underscore) do |*params|
+        define_method(function.name.underscore) do |*params|
           account = (params.last.is_a?(Hash) && params.last[:as]) || default_account
 
           raise ArgumentError, 'must provide a source account' if account.nil?
@@ -61,6 +57,24 @@ module Etherlite::Abi
 
       _class.events << event_class
       _class.const_set(_definition['name'], event_class)
+    end
+
+    def define_class_methods(_class)
+      unlinked_binary = @json['unlinked_binary'] || ''
+
+      _class.class_eval do
+        define_singleton_method('unlinked_binary') { unlinked_binary }
+      end
+    end
+
+    def build_function_from_definition(_definition)
+      Etherlite::Contract::Function.new(
+        _definition['name'],
+        _definition['inputs'].map { |input| LoadType.for signature: input['type'] },
+        _definition['outputs'].map { |input| LoadType.for signature: input['type'] },
+        _definition['payable'],
+        _definition['constant']
+      )
     end
   end
 end

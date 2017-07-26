@@ -14,7 +14,9 @@ describe Etherlite::Abi do
               { 'name' => "integer", 'type' => "uint256" }
             ],
             'name' => "fooBar",
-            'outputs' => [],
+            'outputs' => [
+              { 'name' => "string", 'type' => "string" }
+            ],
             'payable' => false,
             'type' => "function"
           },
@@ -38,7 +40,8 @@ describe Etherlite::Abi do
             'name' => "Deposit",
             'type' => "event"
           }
-        ]
+        ],
+        'unlinked_binary' => '0xd474'
       )
     end
 
@@ -46,17 +49,21 @@ describe Etherlite::Abi do
       expect(contract).to be < Etherlite::Contract::Base
     end
 
-    it "properly loads the contract's functions" do
+    it "loads the contract's functions" do
       expect(contract.functions.count).to eq 2
 
       expect(contract.functions.first.constant?).to be false
-      expect(contract.functions.first.args.count).to eq 1
+      expect(contract.functions.first.inputs.count).to eq 1
+      expect(contract.functions.first.inputs[0]).to be_a Etherlite::Types::Integer
+      expect(contract.functions.first.outputs.count).to eq 1
+      expect(contract.functions.first.outputs[0]).to be_a Etherlite::Types::String
 
       expect(contract.functions.last.constant?).to be true
-      expect(contract.functions.last.args.count).to eq 2
+      expect(contract.functions.last.inputs.count).to eq 2
+      expect(contract.functions.last.outputs.count).to eq 0
     end
 
-    it "properly loads the contract's events" do
+    it "loads the contract's events" do
       expect(contract.events.count).to eq 1
 
       expect(contract.events.first.inputs.count).to eq 2
@@ -64,6 +71,10 @@ describe Etherlite::Abi do
       expect(contract.events.first.inputs.last.indexed?).to be false
 
       expect(contract::Deposit).to be < Etherlite::Contract::EventBase
+    end
+
+    it "adds a 'unlinked_binary' class method to the contract" do
+      expect(contract.unlinked_binary).to eq '0xd474'
     end
 
     context "given an instance of the contract with a default account" do
@@ -94,12 +105,18 @@ describe Etherlite::Abi do
       expect { abi.load_function('void baz(bytes33)') }.to raise_error ArgumentError
     end
 
-    it "properly parses name and arguments" do
+    it "properly parses name and inputs" do
       function = abi.load_function('void baz(uint32,bool)')
       expect(function.name).to eq 'baz'
-      expect(function.args.count).to eq 2
-      expect(function.args[0]).to be_a(Etherlite::Types::Integer)
-      expect(function.args[1]).to be_a(Etherlite::Types::Boolean)
+      expect(function.inputs.count).to eq 2
+      expect(function.inputs[0]).to be_a Etherlite::Types::Integer
+      expect(function.inputs[1]).to be_a Etherlite::Types::Boolean
+    end
+
+    it "properly parses outputs" do
+      function = abi.load_function('uint baz()')
+      expect(function.outputs.count).to eq 1
+      expect(function.outputs[0]).to be_a Etherlite::Types::Integer
     end
 
     it "properly sets the constant attribute" do
