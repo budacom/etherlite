@@ -1,7 +1,9 @@
 pragma solidity ^0.4.8;
 
 contract TestContract {
-	event TestEvent(int indexed _intParam, string _stringParam);
+	event TestEvent(int indexed intParam, uint uintParam, string stringParam);
+	event TestEvent1(string indexed param);
+	event TestEvent2(string indexed param);
 
 	function testString(string _return) constant returns (string result) {
 		return _return;
@@ -25,5 +27,14 @@ contract TestContract {
 
 	function testIntDynArray(int[] _array) constant returns (int[] result) {
 		return _array;
+	}
+
+	function testEvent(int _intParam, uint _uintParam, string _stringParam) {
+		TestEvent(_intParam, _uintParam, _stringParam);
+	}
+
+	function testEvents() {
+		TestEvent1('foo');
+		TestEvent2('bar');
 	}
 }
