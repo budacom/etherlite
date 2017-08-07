@@ -30,7 +30,7 @@ class Etherlite::Contract::EventBase
       topics = @json['topics'][1..-1]
       indexed_inputs.each_with_index.map do |input, i|
         # dynamic indexed inputs cannot be retrieved (only the hash is stored)
-        input.type.dynamic? ? topics[i] : input.type.decode(@connection, topics[i])
+        input.type.dynamic? ? topics[i] : input.type.decode(@connection, topics[i][2..-1])
       end
     end
 

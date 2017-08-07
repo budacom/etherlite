@@ -54,6 +54,7 @@ describe 'Test contract interaction' do
       expect(last_log.int_param).to eq -10
       expect(last_log.uint_param).to eq 30
       expect(last_log.string_param).to eq 'foo'
+      expect(last_log.address_param.to_s).to eq client.default_account.address
     end
 
     it "properly handles the `testEvents` example" do
