@@ -9,7 +9,7 @@ module Etherlite
     end
 
     def refresh
-      @receipt = @connection.eth_get_transaction_receipt(@tx_hash)
+      @receipt = @connection.eth_get_transaction_receipt(@tx_hash) || {}
       mined?
     end
 
