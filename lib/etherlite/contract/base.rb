@@ -10,6 +10,14 @@ module Etherlite::Contract
       @events ||= []
     end
 
+    def self.unlinked_binary
+      '0x0'
+    end
+
+    def self.constructor
+      nil
+    end
+
     def self.binary
       @binary ||= begin
         if /__[^_]+_+/ === unlinked_binary
@@ -20,12 +28,16 @@ module Etherlite::Contract
       end
     end
 
-    def self.deploy(_options = {})
-      account = _options[:as] || _options[:client].default_account
+    def self.deploy(*_args)
+      options = _args.last.is_a?(Hash) ? _args.pop : {}
+      as = options[:as] || options[:client].try(:default_account) || Etherlite.default_account
 
-      tx = account.send_transaction({ data: binary }.merge(_options))
-      if tx.wait_for_block(timeout: _options.fetch(:timeout, 120))
-        at tx.contract_address, as: account
+      tx_data = binary
+      tx_data += constructor.encode(_args) unless constructor.nil?
+
+      tx = as.send_transaction({ data: tx_data }.merge(options))
+      if tx.wait_for_block(timeout: options.fetch(:timeout, 120))
+        at tx.contract_address, as: as
       end
     end
 

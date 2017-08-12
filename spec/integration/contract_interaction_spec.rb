@@ -1,20 +1,8 @@
 require 'spec_helper'
 
-describe 'Test contract interaction' do
+describe 'Test contract interaction', integration: true do
   let(:abi_location) { File.expand_path('./spec/test_contract/build/contracts/TestContract.json') }
   let(:contract_class) { Etherlite::Abi.load_contract_at abi_location }
-  let(:client) { Etherlite.connect 'http://localhost:8001' }
-
-  around(:each) do |example|
-    WebMock.allow_net_connect!
-    snapshot_id = client.connection.evm_snapshot
-    begin
-      example.run
-    ensure
-      client.connection.evm_revert snapshot_id
-      WebMock.disable_net_connect!
-    end
-  end
 
   context "when contract has been deployed" do
     let!(:contract) { contract_class.deploy client: client, gas: 1000000 }
