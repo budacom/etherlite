@@ -1,5 +1,6 @@
 require "digest/sha3"
 require "active_support/all"
+require "forwardable"
 require "power-types"
 
 require "etherlite/version"
