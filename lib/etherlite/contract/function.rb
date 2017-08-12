@@ -31,10 +31,14 @@ module Etherlite::Contract
         raise ArgumentError, "Expected #{@inputs.count} arguments, got #{_values.length} "
       end
 
-      signature_hash = Etherlite::Utils.sha3 signature
       encoded_inputs = Etherlite::Support::Array.encode(@inputs, _values)
 
-      '0x' + signature_hash[0..7] + encoded_inputs
+      if @name
+        signature_hash = Etherlite::Utils.sha3 signature
+        '0x' + signature_hash[0..7] + encoded_inputs
+      else
+        encoded_inputs # if no name is provided, just render arguments
+      end
     end
 
     def decode(_connection, _data)

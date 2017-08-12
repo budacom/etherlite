@@ -3,17 +3,17 @@ require 'etherlite/commands/contract/event_base/decode_log_inputs'
 module Etherlite::Contract
   class EventBase
     def self.inputs
-      @inputs
+      nil # To be implemented by sub classes
     end
 
     def self.original_name
-      @original_name
+      nil # To be implemented by sub classes
     end
 
     def self.signature
       @signature ||= begin
-        input_sig = @inputs.map { |i| i.type.signature }
-        "#{@original_name}(#{input_sig.join(',')})"
+        input_sig = inputs.map { |i| i.type.signature }
+        "#{original_name}(#{input_sig.join(',')})"
       end
     end
 

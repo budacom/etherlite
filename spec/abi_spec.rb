@@ -39,6 +39,13 @@ describe Etherlite::Abi do
             ],
             'name' => "Deposit",
             'type' => "event"
+          },
+          {
+            'inputs' => [
+              { 'name' => "uintParam", 'type' => "uint256" },
+              { 'name' => "stringParam", 'type' => "string" }
+            ],
+            'type' => "constructor"
           }
         ],
         'unlinked_binary' => '0xd474'
@@ -47,6 +54,13 @@ describe Etherlite::Abi do
 
     it "generates a new contract class" do
       expect(contract).to be < Etherlite::Contract::Base
+    end
+
+    it "loads the contract's constructor" do
+      expect(contract.constructor).to be_a Etherlite::Contract::Function
+      expect(contract.constructor.inputs.count).to eq 2
+      expect(contract.constructor.inputs[0]).to be_a Etherlite::Types::Integer
+      expect(contract.constructor.inputs[1]).to be_a Etherlite::Types::String
     end
 
     it "loads the contract's functions" do

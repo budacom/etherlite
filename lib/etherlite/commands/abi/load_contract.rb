@@ -1,9 +1,9 @@
 module Etherlite::Abi
-  class LoadContract < PowerTypes::Command.new(:json)
+  class LoadContract < PowerTypes::Command.new(:artifact)
     def perform
       klass = Class.new(Etherlite::Contract::Base)
 
-      define_class_methods klass
+      define_class_getter klass, 'unlinked_binary', unlinked_binary
 
       abi_definitions.each do |definition|
         case definition['type']
@@ -11,6 +11,8 @@ module Etherlite::Abi
           define_function klass, definition
         when 'event'
           define_event klass, definition
+        when 'constructor'
+          define_class_getter klass, 'constructor', build_function_from_definition(definition)
         end
       end
 
@@ -21,8 +23,12 @@ module Etherlite::Abi
 
     private
 
+    def unlinked_binary
+      @artifact['unlinked_binary'] || ''
+    end
+
     def abi_definitions
-      @json['abi'] || []
+      @artifact['abi'] || []
     end
 
     def define_function(_class, _definition)
@@ -52,18 +58,16 @@ module Etherlite::Abi
         end
       end
 
-      event_class.instance_variable_set(:@original_name, _definition['name'])
-      event_class.instance_variable_set(:@inputs, event_inputs)
+      define_class_getter event_class, 'original_name', _definition['name']
+      define_class_getter event_class, 'inputs', event_inputs
 
       _class.events << event_class
       _class.const_set(_definition['name'], event_class)
     end
 
-    def define_class_methods(_class)
-      unlinked_binary = @json['unlinked_binary'] || ''
-
+    def define_class_getter(_class, _name, _value)
       _class.class_eval do
-        define_singleton_method('unlinked_binary') { unlinked_binary }
+        define_singleton_method(_name) { _value }
       end
     end
 
@@ -71,9 +75,9 @@ module Etherlite::Abi
       Etherlite::Contract::Function.new(
         _definition['name'],
         _definition['inputs'].map { |input| LoadType.for signature: input['type'] },
-        _definition['outputs'].map { |input| LoadType.for signature: input['type'] },
-        _definition['payable'],
-        _definition['constant']
+        (_definition['outputs'] || []).map { |input| LoadType.for signature: input['type'] },
+        _definition.fetch('payable', false),
+        _definition.fetch('constant', false)
       )
     end
   end
