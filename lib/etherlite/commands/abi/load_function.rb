@@ -6,7 +6,9 @@ module Etherlite::Abi
       parts = MATCHER.match @signature
       raise ArgumentError, 'invalid method signature' if parts.nil?
 
-      inputs = parts[3].split(',').map { |a| LoadType.for(signature: a.strip) }
+      inputs = parts[3].split(',').map do |a|
+        Etherlite::Contract::FunctionInput.new nil, LoadType.for(signature: a.strip)
+      end
 
       case parts[1]
       when 'payable'

@@ -26,6 +26,7 @@ require "etherlite/contract/base"
 require "etherlite/contract/event_base"
 require "etherlite/contract/event_input"
 require "etherlite/contract/function"
+require "etherlite/contract/function_input"
 
 require "etherlite/errors"
 require "etherlite/configuration"
