@@ -7,12 +7,11 @@ module Etherlite
     extend self
 
     def load_contract_at(_path)
-      json = JSON.parse File.read(_path)
-      LoadContract.for json: json
+      load_contract JSON.parse File.read(_path)
     end
 
     def load_contract(_json)
-      LoadContract.for json: _json
+      LoadContract.for artifact: _json
     end
 
     def load_function(_signature)

@@ -74,7 +74,11 @@ module Etherlite::Abi
     def build_function_from_definition(_definition)
       Etherlite::Contract::Function.new(
         _definition['name'],
-        _definition['inputs'].map { |input| LoadType.for signature: input['type'] },
+        _definition['inputs'].map do |input|
+          Etherlite::Contract::FunctionInput.new(
+            input['name'], LoadType.for(signature: input['type'])
+          )
+        end,
         (_definition['outputs'] || []).map { |input| LoadType.for signature: input['type'] },
         _definition.fetch('payable', false),
         _definition.fetch('constant', false)

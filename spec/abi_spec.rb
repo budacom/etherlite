@@ -59,8 +59,8 @@ describe Etherlite::Abi do
     it "loads the contract's constructor" do
       expect(contract.constructor).to be_a Etherlite::Contract::Function
       expect(contract.constructor.inputs.count).to eq 2
-      expect(contract.constructor.inputs[0]).to be_a Etherlite::Types::Integer
-      expect(contract.constructor.inputs[1]).to be_a Etherlite::Types::String
+      expect(contract.constructor.inputs[0].type).to be_a Etherlite::Types::Integer
+      expect(contract.constructor.inputs[1].type).to be_a Etherlite::Types::String
     end
 
     it "loads the contract's functions" do
@@ -68,7 +68,7 @@ describe Etherlite::Abi do
 
       expect(contract.functions.first.constant?).to be false
       expect(contract.functions.first.inputs.count).to eq 1
-      expect(contract.functions.first.inputs[0]).to be_a Etherlite::Types::Integer
+      expect(contract.functions.first.inputs[0].type).to be_a Etherlite::Types::Integer
       expect(contract.functions.first.outputs.count).to eq 1
       expect(contract.functions.first.outputs[0]).to be_a Etherlite::Types::String
 
@@ -123,8 +123,8 @@ describe Etherlite::Abi do
       function = abi.load_function('void baz(uint32,bool)')
       expect(function.name).to eq 'baz'
       expect(function.inputs.count).to eq 2
-      expect(function.inputs[0]).to be_a Etherlite::Types::Integer
-      expect(function.inputs[1]).to be_a Etherlite::Types::Boolean
+      expect(function.inputs[0].type).to be_a Etherlite::Types::Integer
+      expect(function.inputs[1].type).to be_a Etherlite::Types::Boolean
     end
 
     it "properly parses outputs" do
