@@ -1,4 +1,7 @@
 module Etherlite
+  ##
+  # This class is used internally to keep a record of the last used nonce for a given address
+  #
   class NonceManager
     @@nonce_cache = {}
     @@nonce_mutex = Mutex.new

@@ -9,10 +9,43 @@ module Etherlite::Account
       @normalized_address = _normalized_address
     end
 
+    ##
+    # Send wei to an account/contract
+    #
+    # @param _target (String) The address to send wei to.
+    #
+    # This method also takes the following keyword arguments
+    #
+    # @param amount (Integer) The amount of wei to send.
+    # @param gas (Integer) Optional transaction gas limit override.
+    # @param gas_price (Integer) Optional transaction gas price override in wei.
+    # @param data (String) Optional data to send with transaction, in hex.
+    #
+    # @return [Etherlite::Transaction]
+    #
     def transfer_to(_target, _options = {})
       send_transaction _options.merge(to: _target, value: _options.fetch(:amount, 0))
     end
 
+    ##
+    # Call a contract's method
+    #
+    # @param _target (String) The address of the contract.
+    # @param _function (String|Etherlite::Contract::Function) The function to call.
+    # @param _params (Mixed) The arguments to pass to the function, must match with 
+    # function prototype.
+    #
+    # This method also takes the following keyword arguments
+    #
+    # @param pay (Integer) The amount of wei to send with this call. (only payable)
+    # @param gas (Integer) Optional transaction gas limit override. (only non-constant)
+    # @param gas_price (Integer) Optional transaction gas price override in wei. (only non-constant)
+    # @param data (String) Optional data to send with transaction, in hex. (only non-constant)
+    #
+    # @return [Etherlite::Transaction|Mixed] For non-constant functions, this method will 
+    # return a transaction. For constant functions, this method will return the value returned
+    # by the call.
+    #
     def call(_target, _function, *_params)
       _function = parse_function(_function) if _function.is_a? String
       options = _params.last.is_a?(Hash) ? _params.pop.clone : {}
