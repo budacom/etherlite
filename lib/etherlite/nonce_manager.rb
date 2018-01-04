@@ -23,11 +23,11 @@ module Etherlite
 
         begin
           result = yield next_nonce
-          @@nonce_cache[_normalized_address] = next_nonce
+          @@nonce_cache[_normalized_address] = next_nonce if caching_enabled?
           return result
         rescue
           # if yield fails, cant be sure about transaction status so must rely again on observing.
-          @@nonce_cache.delete _normalized_address
+          @@nonce_cache.delete _normalized_address if caching_enabled?
           raise
         end
       end
@@ -36,9 +36,12 @@ module Etherlite
     private
 
     def last_observed_nonce_for(_normalized_address)
-      # TODO: support using tx_pool API to improve this:
-      # http://qnimate.com/calculating-nonce-for-raw-transactions-in-geth/
+      # https://github.com/ethereum/go-ethereum/issues/2736
       @connection.eth_get_transaction_count('0x' + _normalized_address, 'pending') - 1
+    end
+
+    def caching_enabled?
+      Etherlite.config.enable_nonce_cache
     end
   end
 end
