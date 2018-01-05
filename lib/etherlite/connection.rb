@@ -1,12 +1,14 @@
 module Etherlite
   class Connection
     include Api::Rpc
+    include Api::ParityRpc
 
-    attr_reader :chain_id
+    attr_reader :chain_id, :use_parity
 
-    def initialize(_uri, _chain_id = nil)
+    def initialize(_uri, _options = {})
       @uri = _uri
-      @chain_id = _chain_id
+      @chain_id = _options[:chain_id]
+      @use_parity = _options[:use_parity]
     end
 
     def ipc_call(_method, *_params)

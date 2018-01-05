@@ -12,9 +12,11 @@ describe Etherlite::Account::PrivateKey do
     Etherlite::NonceManager.clear_cache
 
     allow(connection).to receive(:chain_id).and_return 1
+    allow(connection).to receive(:use_parity).and_return false
     allow(connection).to receive(:eth_gas_price).and_return gas_price
     allow(connection).to receive(:eth_get_transaction_count)
       .with('0x' + pk_address, 'pending').and_return tx_count
+    allow(connection).to receive(:eth_send_raw_transaction).and_return 'foo'
   end
 
   describe "#normalized_address" do
@@ -48,6 +50,21 @@ describe Etherlite::Account::PrivateKey do
 
       expect(tx).to be_a Etherlite::Transaction
       expect(tx.tx_hash).to eq 'a_hash'
+    end
+
+    context "when use_parity flag is set to true" do
+      before do
+        allow(connection).to receive(:use_parity).and_return true
+      end
+
+      it "calls parity_next_nonce instead of eth_get_transaction_count" do
+        expect(connection).to receive(:parity_next_nonce).with('0x' + pk_address).and_return 2
+        expect(connection).not_to receive(:eth_get_transaction_count)
+
+        account.send_transaction(
+          to: target_address, data: data, value: amount, gas: gas_limit
+        )
+      end
     end
   end
 

@@ -1,4 +1,5 @@
 defaults:
+  use_parity: false
   contract_path: 'contracts'
 
 development: &defaults

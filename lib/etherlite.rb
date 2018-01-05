@@ -1,6 +1,7 @@
 require "digest/sha3"
 require "active_support/all"
 require "forwardable"
+require "net/http"
 require "power-types"
 
 require "etherlite/version"
@@ -8,6 +9,7 @@ require "etherlite/version"
 require "etherlite/api/address"
 require "etherlite/api/node"
 require "etherlite/api/rpc"
+require "etherlite/api/parity_rpc"
 
 require "etherlite/support/array"
 
@@ -52,7 +54,10 @@ module Etherlite
   def self.connect(_url, _options = {})
     _url = URI(_url) unless _url.is_a? URI
 
-    Client.new Connection.new(_url, _options.fetch(:chain_id, config.chain_id))
+    options = config.default_connection_options
+    options = options.merge _options.slice options.keys
+
+    Client.new Connection.new(_url, options)
   end
 
   def self.config
@@ -69,7 +74,7 @@ module Etherlite
   end
 
   def self.connection
-    @connection ||= Connection.new(URI(config.url), config.chain_id)
+    @connection ||= Connection.new(URI(config.url), config.default_connection_options)
   end
 end
 

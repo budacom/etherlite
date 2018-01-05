@@ -36,8 +36,12 @@ module Etherlite
     private
 
     def last_observed_nonce_for(_normalized_address)
-      # https://github.com/ethereum/go-ethereum/issues/2736
-      @connection.eth_get_transaction_count('0x' + _normalized_address, 'pending') - 1
+      if @connection.use_parity
+        @connection.parity_next_nonce('0x' + _normalized_address) - 1
+      else
+        # https://github.com/ethereum/go-ethereum/issues/2736
+        @connection.eth_get_transaction_count('0x' + _normalized_address, 'pending') - 1
+      end
     end
 
     def caching_enabled?
