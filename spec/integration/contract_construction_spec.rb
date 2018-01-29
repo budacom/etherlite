@@ -11,8 +11,10 @@ describe 'Test contract interaction', integration: true do
     uint = rand(100)
     string = "string_#{rand(100)}"
 
-    contract = contract_class.deploy uint, string, client: client, gas: 1000000
+    tx = contract_class.deploy uint, string, client: client, gas: 1000000
+    tx.wait_for_block
 
+    contract = contract_class.at tx.contract_address, client: client
     expect(contract.uint_param).to eq uint
     expect(contract.string_param).to eq string
   end

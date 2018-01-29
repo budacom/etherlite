@@ -5,7 +5,11 @@ describe 'Test contract interaction', integration: true do
   let(:contract_class) { Etherlite::Abi.load_contract_at abi_location }
 
   context "when contract has been deployed" do
-    let!(:contract) { contract_class.deploy client: client, gas: 1000000 }
+    let!(:contract) do
+      tx = contract_class.deploy client: client, gas: 1000000
+      tx.wait_for_block
+      contract_class.at tx.contract_address, client: client
+    end
 
     it "is assigned an address" do
       expect(contract.address).not_to be nil

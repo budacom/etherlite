@@ -35,10 +35,7 @@ module Etherlite::Contract
       tx_data = binary
       tx_data += constructor.encode(_args) unless constructor.nil?
 
-      tx = as.send_transaction({ data: tx_data }.merge(options))
-      if tx.wait_for_block(timeout: options.fetch(:timeout, 120))
-        at tx.contract_address, as: as
-      end
+      as.send_transaction({ data: tx_data }.merge(options))
     end
 
     def self.at(_address, client: nil, as: nil)
