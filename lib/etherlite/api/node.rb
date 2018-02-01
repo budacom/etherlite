@@ -12,6 +12,22 @@ module Etherlite
         connection.eth_gas_price
       end
 
+      def get_transaction(_hash)
+        load_transaction(_hash).refresh
+      end
+
+      def load_transaction(_hash)
+        Transaction.new(connection, _hash)
+      end
+
+      def load_account(from_pk: nil)
+        Etherlite::Account::PrivateKey.new connection, from_pk
+      end
+
+      def load_address(_address)
+        Etherlite::Address.new(connection, Etherlite::Utils.normalize_address_param(_address))
+      end
+
       def register_account(_passphrase)
         address = connection.ipc_call(:personal_newAccount, _passphrase)
         Etherlite::Account::Local.new @connection, Etherlite::Utils.normalize_address(address)
@@ -28,7 +44,12 @@ module Etherlite
       end
 
       def account_from_pk(_pk)
-        Etherlite::Account::PrivateKey.new connection, _pk
+        Etherlite.logger.warn(
+          "use of 'account_from_pk' is deprecated and will be removed in next version, \
+use 'load_account' instead"
+        )
+
+        load_account(from_pk: _pk)
       end
 
       def_delegators :default_account, :unlock, :lock, :normalized_address, :transfer_to, :call

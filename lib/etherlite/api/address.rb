@@ -6,12 +6,8 @@ module Etherlite
       end
 
       def get_balance(block: :latest)
-        Etherlite::Utils.hex_to_uint(
-          connection.ipc_call(
-            :eth_getBalance,
-            json_encoded_address,
-            Etherlite::Utils.encode_block_param(block)
-          )
+        connection.eth_get_balance(
+          json_encoded_address, Etherlite::Utils.encode_block_param(block)
         )
       end
 

@@ -17,6 +17,10 @@ module Etherlite
         Etherlite::Utils.hex_to_uint ipc_call(:eth_getTransactionCount, _address, _block)
       end
 
+      def eth_get_balance(_address, _block = 'latest')
+        Etherlite::Utils.hex_to_uint ipc_call(:eth_getBalance, _address, _block)
+      end
+
       def eth_call(_params, _block = 'latest')
         ipc_call(:eth_call, _params, _block)
       end

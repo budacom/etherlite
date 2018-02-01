@@ -33,6 +33,10 @@ module Etherlite::Account
       raise NotSupportedError, 'transactions are not supported by this kind of account'
     end
 
+    def ==(_other)
+      normalized_address == _other.normalized_address
+    end
+
     private
 
     def call_constant(_target, _function, _params, _options)
