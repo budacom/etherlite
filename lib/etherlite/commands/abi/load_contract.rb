@@ -24,7 +24,7 @@ module Etherlite::Abi
     private
 
     def unlinked_binary
-      @artifact['unlinked_binary'] || ''
+      @artifact['unlinked_binary'] || @artifact['bytecode'] || ''
     end
 
     def abi_definitions
