@@ -21,8 +21,6 @@ describe 'Test node functions against testrpc', integration: true do
     let(:pk_address) { '0xe8C1b5A6ac249b8f01AA042B5819607bbf06C557' }
     let!(:hash) { client.transfer_to(pk_address, amount: 1e18.to_i).tx_hash }
 
-    before { client.connection.evm_mine }
-
     describe "#load_address" do
       it "returns an address object that can be queried for balance" do
         expect(client.load_address(pk_address).get_balance).to eq 1e18.to_i
@@ -50,8 +48,22 @@ describe 'Test node functions against testrpc', integration: true do
 
     describe "#load_transaction" do
       it "returns an transaction object that can be queried for transaction status" do
-        expect(client.load_transaction(hash).refresh.gas_used).to eq 21000 # tx default gas
-        expect(client.load_transaction(hash).refresh.block_number).to eq(client.get_block_number - 1)
+        expect(client.load_transaction(hash).refresh.succeeded?).to be true
+        expect(client.load_transaction(hash).refresh.mined?).to be true
+      end
+
+      it "returns an transaction object that can be queried for transaction gas usage" do
+        expect(client.load_transaction(hash).refresh.gas_used).to eq 21000
+      end
+
+      it "returns an transaction object that can be queried for transaction block number" do
+        expect(client.load_transaction(hash).refresh.block_number).to eq 1
+      end
+
+      it "returns an transaction object that can be queried for transaction confirmations" do
+        expect(client.load_transaction(hash).refresh.confirmations).to eq 0
+        client.connection.evm_mine
+        expect(client.load_transaction(hash).refresh.confirmations).to eq 1
       end
     end
   end

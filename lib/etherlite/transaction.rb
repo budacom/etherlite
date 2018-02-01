@@ -10,11 +10,25 @@ module Etherlite
 
     def refresh
       @receipt = @connection.eth_get_transaction_receipt(@tx_hash) || {}
-      mined?
+      self
+    end
+
+    def removed?
+      @receipt.nil?
+    end
+
+    def succeeded?
+      !removed? && @receipt['status'] == 1
     end
 
     def mined?
-      @receipt.key? 'blockNumber'
+      !removed? && @receipt.key?('blockNumber')
+    end
+
+    def confirmations
+      return 0 unless mined?
+
+      @connection.eth_block_number - block_number
     end
 
     def gas_used
@@ -31,7 +45,8 @@ module Etherlite
 
     def wait_for_block(timeout: 120)
       start = Time.now
-      while !refresh
+      while !refresh.mined?
+        return false if removed?
         return false if Time.now - start > timeout
         sleep 1
       end
