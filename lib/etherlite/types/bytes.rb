@@ -14,6 +14,9 @@ module Etherlite::Types
     end
 
     def encode(_value)
+      raise ArgumentError, "invalid argument type for 'bytes'" unless _value.is_a? ::String
+
+      _value.unpack('H*').first.rjust(64, '0')
     end
   end
 end
