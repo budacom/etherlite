@@ -15,7 +15,7 @@ module Etherlite
             data: _options.fetch(:data, ''),
             gas_limit: _options.fetch(:gas, 90_000),
             gas_price: _options.fetch(:gas_price, gas_price),
-            to: Etherlite::Utils.encode_address_param(_options[:to]),
+            to: (Etherlite::Utils.encode_address_param(_options[:to]) if _options.key?(:to)),
             nonce: nonce
           )
 
