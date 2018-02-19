@@ -18,7 +18,13 @@ module Etherlite
     end
 
     def succeeded?
-      !removed? && @receipt['status'] == 1
+      status == 1
+    end
+
+    def status
+      return nil if removed?
+      status = @receipt['status']
+      status.is_a?(String) ? Utils.hex_to_uint(status) : status
     end
 
     def mined?
