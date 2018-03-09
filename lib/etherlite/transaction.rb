@@ -41,6 +41,14 @@ module Etherlite
       Utils.hex_to_uint @receipt['gasUsed']
     end
 
+    def logs
+      @receipt['logs'] || []
+    end
+
+    def events
+      ::Etherlite::EventProvider.parse_raw_logs(@connection, logs)
+    end
+
     def block_number
       Utils.hex_to_uint @receipt['blockNumber']
     end

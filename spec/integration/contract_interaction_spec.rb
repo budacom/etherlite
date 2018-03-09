@@ -49,6 +49,15 @@ describe 'Test contract interaction', integration: true do
       expect(last_log.address_param.to_s).to eq client.default_account.address
     end
 
+    it "properly handles the `testEvent` second example (contract returned transaction)" do
+      tx = contract.test_event(-10, 30, 'foo')
+      tx.refresh
+
+      expect(tx.events.length).to eq 1
+      expect(tx.events.first).to be_a contract_class::TestEvent
+      expect(tx.events.first.int_param).to eq -10
+    end
+
     it "properly handles the `testEvents` example" do
       expect { contract.test_events }.to change { contract.get_logs.count }.by(2)
 

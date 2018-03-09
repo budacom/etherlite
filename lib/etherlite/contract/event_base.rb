@@ -17,6 +17,10 @@ module Etherlite::Contract
       end
     end
 
+    def self.topic
+      '0x' + Etherlite::Utils.sha3(signature)
+    end
+
     def self.decode(_connection, _json)
       new(
         _json['blockNumber'].nil? ? nil : Etherlite::Utils.hex_to_uint(_json['blockNumber']),

@@ -32,6 +32,7 @@ require "etherlite/contract/function_input"
 
 require "etherlite/errors"
 require "etherlite/configuration"
+require "etherlite/event_provider"
 require "etherlite/abi"
 require "etherlite/utils"
 require "etherlite/connection"

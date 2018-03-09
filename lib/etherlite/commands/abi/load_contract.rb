@@ -18,6 +18,7 @@ module Etherlite::Abi
 
       klass.functions.freeze
       klass.events.freeze
+      ::Etherlite::EventProvider.register_contract_events klass
       klass
     end
 

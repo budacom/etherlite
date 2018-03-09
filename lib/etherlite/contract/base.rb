@@ -64,24 +64,14 @@ module Etherlite::Contract
         toBlock: Etherlite::Utils.encode_block_param(to_block)
       }
 
-      params[:topics] = [events.map { |e| event_topic e }] unless events.nil?
-
-      event_map = Hash[(events || self.class.events).map { |e| [event_topic(e), e] }]
+      params[:topics] = [events.map(&:topic)] unless events.nil?
 
       logs = @connection.ipc_call(:eth_getLogs, params)
-      logs.map do |log|
-        event = event_map[log["topics"].first]
-        # TODO: support anonymous events!
-        event.decode(@connection, log) unless event.nil?
-      end
+      ::Etherlite::EventProvider.parse_raw_logs(@connection, logs)
     end
 
     private
 
     attr_reader :default_account, :normalized_address
-
-    def event_topic(_event)
-      '0x' + Etherlite::Utils.sha3(_event.signature)
-    end
   end
 end

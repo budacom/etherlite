@@ -12,8 +12,8 @@ module Etherlite
         connection.eth_gas_price
       end
 
-      def get_transaction(_hash)
-        load_transaction(_hash).refresh
+      def get_transaction(*_args)
+        load_transaction(*_args).refresh
       end
 
       def load_transaction(_hash)
