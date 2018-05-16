@@ -9,6 +9,10 @@ module Etherlite
         Etherlite::Utils.hex_to_uint ipc_call(:eth_gasPrice)
       end
 
+      def eth_get_transaction_by_hash(_tx_hash)
+        ipc_call(:eth_getTransactionByHash, _tx_hash)
+      end
+
       def eth_get_transaction_receipt(_tx_hash)
         ipc_call(:eth_getTransactionReceipt, _tx_hash)
       end

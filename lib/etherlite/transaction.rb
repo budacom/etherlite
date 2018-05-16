@@ -37,8 +37,20 @@ module Etherlite
       @connection.eth_block_number - block_number
     end
 
+    def gas
+      Utils.hex_to_uint original['gas']
+    end
+
     def gas_used
       Utils.hex_to_uint @receipt['gasUsed']
+    end
+
+    def gas_price
+      Utils.hex_to_uint original['gasPrice']
+    end
+
+    def value
+      Utils.hex_to_uint original['value']
     end
 
     def logs
@@ -66,6 +78,12 @@ module Etherlite
       end
 
       true
+    end
+
+    private
+
+    def original
+      @original ||= @connection.eth_get_transaction_by_hash(@tx_hash)
     end
   end
 end
