@@ -10,7 +10,7 @@ module Etherlite::Contract
       @events ||= []
     end
 
-    def self.unlinked_binary
+    def self.unlinked_bytecode
       '0x0'
     end
 
@@ -18,13 +18,13 @@ module Etherlite::Contract
       nil
     end
 
-    def self.binary
-      @binary ||= begin
-        if /__[^_]+_+/ === unlinked_binary
+    def self.bytecode
+      @bytecode ||= begin
+        if /__[^_]+_+/.match? unlinked_bytecode
           raise UnlinkedContractError, 'compiled contract contains unresolved library references'
         end
 
-        unlinked_binary
+        unlinked_bytecode
       end
     end
 
@@ -32,7 +32,7 @@ module Etherlite::Contract
       options = _args.last.is_a?(Hash) ? _args.pop : {}
       as = options[:as] || options[:client].try(:default_account) || Etherlite.default_account
 
-      tx_data = binary
+      tx_data = options.fetch(:bytecode, bytecode)
       tx_data += constructor.encode(_args) unless constructor.nil?
 
       as.send_transaction({ data: tx_data }.merge(options))

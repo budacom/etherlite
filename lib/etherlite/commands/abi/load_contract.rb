@@ -3,7 +3,7 @@ module Etherlite::Abi
     def perform
       klass = Class.new(Etherlite::Contract::Base)
 
-      define_class_getter klass, 'unlinked_binary', unlinked_binary
+      define_class_getter klass, 'unlinked_bytecode', unlinked_bytecode
 
       abi_definitions.each do |definition|
         case definition['type']
@@ -24,7 +24,7 @@ module Etherlite::Abi
 
     private
 
-    def unlinked_binary
+    def unlinked_bytecode
       @artifact['unlinked_binary'] || @artifact['bytecode'] || ''
     end
 

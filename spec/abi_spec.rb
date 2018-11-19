@@ -87,8 +87,8 @@ describe Etherlite::Abi do
       expect(contract::Deposit).to be < Etherlite::Contract::EventBase
     end
 
-    it "adds a 'unlinked_binary' class method to the contract" do
-      expect(contract.unlinked_binary).to eq '0xd474'
+    it "adds a 'unlinked_bytecode' class method to the contract" do
+      expect(contract.unlinked_bytecode).to eq '0xd474'
     end
 
     context "given an instance of the contract with a default account" do
