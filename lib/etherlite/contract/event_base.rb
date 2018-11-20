@@ -25,15 +25,17 @@ module Etherlite::Contract
       new(
         _json['blockNumber'].nil? ? nil : Etherlite::Utils.hex_to_uint(_json['blockNumber']),
         _json['transactionHash'],
+        _json['address'],
         DecodeLogInputs.for(connection: _connection, inputs: inputs, json: _json)
       )
     end
 
-    attr_reader :block_number, :tx_hash, :attributes
+    attr_reader :block_number, :tx_hash, :address, :attributes
 
-    def initialize(_block_number, _tx_hash, _attributes)
+    def initialize(_block_number, _tx_hash, _address, _attributes)
       @block_number = _block_number
       @tx_hash = _tx_hash
+      @address = _address
       @attributes = _attributes
     end
   end

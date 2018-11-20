@@ -16,6 +16,19 @@ module Etherlite
         load_transaction(*_args).refresh
       end
 
+      def get_logs(events: nil, address: nil, from_block: :earliest, to_block: :latest)
+        params = {
+          fromBlock: Etherlite::Utils.encode_block_param(from_block),
+          toBlock: Etherlite::Utils.encode_block_param(to_block)
+        }
+
+        params[:topics] = [Array(events).map(&:topic)] unless events.nil?
+        params[:address] = Etherlite::Utils.encode_address_param(address) unless address.nil?
+
+        logs = connection.ipc_call(:eth_getLogs, params)
+        ::Etherlite::EventProvider.parse_raw_logs(connection, logs)
+      end
+
       def load_transaction(_hash)
         Transaction.new(connection, _hash)
       end
