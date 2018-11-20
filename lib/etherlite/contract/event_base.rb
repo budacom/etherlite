@@ -25,7 +25,7 @@ module Etherlite::Contract
       new(
         _json['blockNumber'].nil? ? nil : Etherlite::Utils.hex_to_uint(_json['blockNumber']),
         _json['transactionHash'],
-        _json['address'],
+        Etherlite::Address.new(_connection, Etherlite::Utils.normalize_address(_json['address'])),
         DecodeLogInputs.for(connection: _connection, inputs: inputs, json: _json)
       )
     end
