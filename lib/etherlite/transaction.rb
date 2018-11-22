@@ -5,7 +5,7 @@ module Etherlite
     def initialize(_connection, _tx_hash)
       @connection = _connection
       @tx_hash = _tx_hash
-      @receipt = {}
+      @receipt = nil
     end
 
     def refresh
@@ -14,7 +14,7 @@ module Etherlite
     end
 
     def removed?
-      @receipt.nil?
+      @receipt.empty?
     end
 
     def succeeded?
