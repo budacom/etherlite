@@ -52,6 +52,19 @@ describe Etherlite::Account::PrivateKey do
       expect(tx.tx_hash).to eq 'a_hash'
     end
 
+    it "calls 'eth_send_raw_transaction' with previous nonce if 'replace' option is given" do
+      expect(connection).to receive(:eth_send_raw_transaction) do |raw|
+        tx = Eth::Tx.decode raw
+        expect(tx.nonce).to eq tx_count - 1
+
+        'a_hash'
+      end
+
+      account.send_transaction(
+        to: target_address, data: data, value: amount, gas: gas_limit, replace: true
+      )
+    end
+
     context "when use_parity flag is set to true" do
       before do
         allow(connection).to receive(:use_parity).and_return true

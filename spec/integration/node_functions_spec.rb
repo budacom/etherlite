@@ -61,9 +61,9 @@ describe 'Test node functions against testrpc', integration: true do
       end
 
       it "returns an transaction object that can be queried for transaction confirmations" do
-        expect(client.load_transaction(hash).refresh.confirmations).to eq 0
-        client.connection.evm_mine
         expect(client.load_transaction(hash).refresh.confirmations).to eq 1
+        client.connection.evm_mine
+        expect(client.load_transaction(hash).refresh.confirmations).to eq 2
       end
     end
   end
