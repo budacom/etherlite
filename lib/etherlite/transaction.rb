@@ -1,72 +1,92 @@
 module Etherlite
   class Transaction
-    attr_reader :tx_hash, :receipt
+    attr_reader :tx_hash
 
     def initialize(_connection, _tx_hash)
       @connection = _connection
       @tx_hash = _tx_hash
-      @receipt = nil
+      @loaded = false
     end
 
     def refresh
-      @receipt = @connection.eth_get_transaction_receipt(@tx_hash) || {}
+      @original = @connection.eth_get_transaction_by_hash(@tx_hash)
+      @loaded = true
       self
     end
 
+    def original
+      refresh unless @loaded
+      @original
+    end
+
     def removed?
-      @receipt.empty?
+      original.nil?
+    end
+
+    def mined?
+      original.present? && !original['blockNumber'].nil?
+    end
+
+    def gas
+      original && Utils.hex_to_uint(original['gas'])
+    end
+
+    def gas_price
+      original && Utils.hex_to_uint(original['gasPrice'])
+    end
+
+    def value
+      original && Utils.hex_to_uint(original['value'])
+    end
+
+    def block_number
+      return nil unless mined?
+
+      Utils.hex_to_uint(original['blockNumber'])
+    end
+
+    def confirmations
+      return 0 unless mined?
+
+      (@connection.eth_block_number - block_number) + 1
+    end
+
+    # receipt attributes
+
+    def receipt
+      return nil unless mined?
+      
+      @receipt ||= @connection.eth_get_transaction_receipt(@tx_hash)
+    end
+
+    def status
+      return nil if receipt.nil?
+
+      receipt['status'].is_a?(String) ? Utils.hex_to_uint(receipt['status']) : receipt['status']
     end
 
     def succeeded?
       status == 1
     end
 
-    def status
-      return nil if removed?
-      status = @receipt['status']
-      status.is_a?(String) ? Utils.hex_to_uint(status) : status
-    end
-
-    def mined?
-      !removed? && @receipt.key?('blockNumber')
-    end
-
-    def confirmations
-      return 0 unless mined?
-
-      @connection.eth_block_number - block_number
-    end
-
-    def gas
-      Utils.hex_to_uint original['gas']
+    def failed?
+      status == 0
     end
 
     def gas_used
-      Utils.hex_to_uint @receipt['gasUsed']
-    end
-
-    def gas_price
-      Utils.hex_to_uint original['gasPrice']
-    end
-
-    def value
-      Utils.hex_to_uint original['value']
+      receipt && Utils.hex_to_uint(receipt['gasUsed'])
     end
 
     def logs
-      @receipt['logs'] || []
+      receipt && (receipt['logs'] || [])
     end
 
     def events
-      ::Etherlite::EventProvider.parse_raw_logs(@connection, logs)
-    end
-
-    def block_number
-      Utils.hex_to_uint @receipt['blockNumber']
+      receipt && ::Etherlite::EventProvider.parse_raw_logs(@connection, logs)
     end
 
     def contract_address
-      @receipt['contractAddress']
+      receipt && receipt['contractAddress']
     end
 
     def wait_for_block(timeout: 120)
@@ -78,12 +98,6 @@ module Etherlite
       end
 
       true
-    end
-
-    private
-
-    def original
-      @original ||= @connection.eth_get_transaction_by_hash(@tx_hash)
     end
   end
 end
