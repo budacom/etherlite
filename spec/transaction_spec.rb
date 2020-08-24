@@ -1,82 +1,191 @@
 require 'spec_helper'
 
 describe Etherlite::Transaction do
-  def self.describe_getter(_name, given:, expect:)
-    describe "##{_name}" do
-      it "calls connection 'eth_get_transaction_by_hash' and returns the transaction #{_name}" do
-        expect(connection)
-          .to receive(:eth_get_transaction_by_hash)
-          .with(tx_hash)
-          .and_return(instance_exec(&given))
+  let(:conn) { instance_double('Etherlite::Connection') }
+  let(:transaction) { described_class.new conn, 'the_hash' }
 
-        expect(transaction.public_send(_name)).to eq instance_exec(&expect)
+  let(:raw_tx) do
+    {
+      'blockNumber' => '0xFFAA',
+      'gas' => '0x10',
+      'gasPrice' => '0x20',
+      'value' => '0x30'
+    }
+  end
+
+  let(:raw_receipt) do
+    {
+      'status' => '0x1',
+      'gasUsed' => '0x40',
+      'logs' => [],
+      'contractAddress' => 'an_address'
+    }
+  end
+
+  let(:block_number) { 65452 }
+
+  before do
+    allow(conn).to receive(:eth_get_transaction_by_hash).with('the_hash').and_return raw_tx
+    allow(conn).to receive(:eth_get_transaction_receipt).with('the_hash').and_return raw_receipt
+    allow(conn).to receive(:eth_block_number).and_return block_number
+  end
+
+  describe "#removed?"  do
+    it "returns false" do
+      expect(transaction.removed?).to be false
+    end
+  end
+
+  describe "#mined?"  do
+    it "returns true" do
+      expect(transaction.mined?).to be true
+    end
+  end
+
+  describe "#gas"  do
+    it "returns gas as integer" do
+      expect(transaction.gas).to eq 16
+    end
+  end
+
+  describe "#gas_price"  do
+    it "returns gas_price as integer" do
+      expect(transaction.gas_price).to eq 32
+    end
+  end
+
+  describe "#value" do
+    it "returns value as integer" do
+      expect(transaction.value).to eq 48
+    end
+  end
+  
+  describe "#block_number" do
+    it "returns block_number as integer" do
+      expect(transaction.block_number).to eq 65450
+    end
+  end
+
+  describe "#confirmations" do
+    it "returns the number of confirmations (considering current block)" do
+      expect(transaction.confirmations).to eq 3
+    end
+  end
+
+  describe "#status" do
+    it "returns status as integer" do
+      expect(transaction.status).to eq 1
+    end
+
+    context "when receipt status is an integer" do
+      let(:raw_receipt) do
+        {
+          'status' => 1
+        }
+      end
+
+      it "returns status as integer" do
+        expect(transaction.status).to eq 1
       end
     end
   end
 
-  let(:connection) { double('Etherlite::Connection') }
-  let(:tx_hash) { 'the_hash' }
-  let(:transaction) { described_class.new connection, tx_hash }
+  describe "#gas_used" do
+    it "returns gas_used as integer" do
+      expect(transaction.gas_used).to eq 64
+    end
+  end
 
-  let(:rand_value) { rand(1000000000) }
-  let(:rand_hex) { '0x' + rand_value.to_s(16) }
+  describe "#logs" do
+    it "returns raw logs" do
+      expect(transaction.logs).to eq []
+    end
+  end
 
-  describe_getter(:value, given: -> { { 'value' => rand_hex } }, expect: -> { rand_value })
-  describe_getter(:gas, given: -> { { 'gas' => rand_hex } }, expect: -> { rand_value })
-  describe_getter(:gas_price, given: -> { { 'gasPrice' => rand_hex } }, expect: -> { rand_value })
+  describe "#contract_address" do
+    it "returns the contract address" do
+      expect(transaction.contract_address).to eq 'an_address'
+    end
+  end
 
-  context "given a receipt is available for tx hash" do
-    let(:raw_receipt) do
+  context "when transaction is pending" do
+    let(:raw_tx) do
       {
-        'blockNumber' => '0x01',
-        'gasUsed' => '0x00FF',
-        'contractAddress' => '0xeb6f323b774186406263d2a2a1ce39b1ba538aad'
+        'gas' => '0x10',
+        'gasPrice' => '0x20',
+        'value' => '0x30'
       }
     end
 
-    before { allow(connection).to receive(:eth_get_transaction_receipt).and_return(raw_receipt) }
+    let(:raw_receipt) { nil }
 
-    describe "#refresh" do
-      it "calls connection 'eth_get_transaction_receipt' and updates tx attributes" do
-        expect(connection)
-          .to receive(:eth_get_transaction_receipt)
-          .with(tx_hash)
-          .and_return raw_receipt
-
-        transaction.refresh
-        expect(transaction.block_number).to eq 1
-        expect(transaction.gas_used).to eq 255
-        expect(transaction.contract_address).to eq '0xeb6f323b774186406263d2a2a1ce39b1ba538aad'
+    describe "#removed?"  do
+      it "returns false" do
+        expect(transaction.removed?).to be false
       end
     end
 
-    context "after calling refresh" do
-      before { transaction.refresh }
+    describe "#mined?"  do
+      it "returns false" do
+        expect(transaction.mined?).to be false
+      end
+    end
 
-      describe "#status" do
-        context "when receipt status is an integer" do
-          let(:raw_receipt) { { 'status' => 1 } }
+    describe "#confirmations" do
+      it "returns 0" do
+        expect(transaction.confirmations).to eq 0
+      end
+    end
 
-          it "returns the status as a number" do
-            expect(transaction.status).to eq 1
-          end
-        end
+    describe "#status" do
+      it "returns nil" do
+        expect(transaction.status).to be nil
+      end
+    end
 
-        context "when receipt status is a hex string" do
-          let(:raw_receipt) { { 'status' => '0x1' } }
+    describe "#gas_used" do
+      it "returns nil" do
+        expect(transaction.gas_used).to be nil
+      end
+    end
 
-          it "returns the status as a number" do
-            expect(transaction.status).to eq 1
-          end
-        end
+    describe "#logs" do
+      it "returns nil" do
+        expect(transaction.logs).to be nil
+      end
+    end
 
-        context "when transaction has been removed" do
-          let(:raw_receipt) { nil }
+    describe "#contract_address" do
+      it "returns nil" do
+        expect(transaction.contract_address).to be nil
+      end
+    end
 
-          it "returns nil" do
-            expect(transaction.status).to be nil
-          end
-        end
+    describe "#refresh" do
+      it "updates the transaction information" do
+        transaction.refresh
+
+        expect do 
+          raw_tx['blockNumber'] = '0x01'
+          transaction.refresh
+        end.to change { transaction.mined? }.to true
+      end
+    end
+  end
+
+  context "when transaction has been removed" do
+    let(:raw_tx) { nil }
+    let(:raw_receipt) { nil }
+
+    describe "#removed?"  do
+      it "returns true" do
+        expect(transaction.removed?).to be true
+      end
+    end
+
+    describe "#mined?"  do
+      it "returns false" do
+        expect(transaction.mined?).to be false
       end
     end
   end
