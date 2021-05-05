@@ -9,6 +9,15 @@ module Etherlite::Account
       @normalized_address = _normalized_address
     end
 
+    def next_nonce
+      if @connection.use_parity
+        @connection.parity_next_nonce(address)
+      else
+        # https://github.com/ethereum/go-ethereum/issues/2736
+        @connection.eth_get_transaction_count(address, 'pending')
+      end
+    end
+
     def transfer_to(_target, _options = {})
       send_transaction _options.merge(to: _target, value: _options.fetch(:amount, 0))
     end
