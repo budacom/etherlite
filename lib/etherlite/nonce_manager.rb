@@ -17,8 +17,10 @@ module Etherlite
       last_nonce
     end
 
-    def with_next_nonce_for(_normalized_address, replace: false)
+    def with_next_nonce_for(_normalized_address, replace: false, nonce: nil)
       @@nonce_mutex.synchronize do
+        return yield nonce if nonce.present?
+
         next_nonce = last_nonce_for(_normalized_address)
         next_nonce += 1 if next_nonce.negative? || !replace # if first tx, don't replace
 

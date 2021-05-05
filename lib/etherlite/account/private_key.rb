@@ -9,10 +9,8 @@ module Etherlite
       end
 
       def send_transaction(_options = {})
-        nonce_options = {
-          replace: _options.fetch(:replace, false)
-        }
-
+        nonce_options = _options.slice(:replace, :nonce)
+        
         nonce_manager.with_next_nonce_for(normalized_address, nonce_options) do |nonce|
           tx = Eth::Tx.new(
             value: _options.fetch(:value, 0),
