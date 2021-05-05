@@ -65,6 +65,19 @@ describe Etherlite::Account::PrivateKey do
       )
     end
 
+    it "calls 'eth_send_raw_transaction' with given nonce if 'nonce' option is given" do
+      expect(connection).to receive(:eth_send_raw_transaction) do |raw|
+        tx = Eth::Tx.decode raw
+        expect(tx.nonce).to eq 123
+
+        'a_hash'
+      end
+
+      account.send_transaction(
+        to: target_address, data: data, value: amount, gas: gas_limit, nonce: 123
+      )
+    end
+
     context "when use_parity flag is set to true" do
       before do
         allow(connection).to receive(:use_parity).and_return true

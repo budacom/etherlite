@@ -5,6 +5,30 @@ describe Etherlite::Account::Base do
   let(:normalized_address) { '4cd677f0f71185775f45e897aec2727914c0ed56' }
   let(:account) { described_class.new connection, normalized_address }
 
+  describe "#next_nonce" do
+    it "calls connection's eth_get_transaction_count if use_parity is false" do
+      allow(connection).to receive(:use_parity).and_return false
+
+      expect(connection)
+        .to receive(:eth_get_transaction_count)
+        .with('0x' + normalized_address, 'pending')
+        .and_return 123
+
+      expect(account.next_nonce).to eq 123
+    end
+
+    it "calls connection's parity_next_nonce if use_parity is true" do
+      allow(connection).to receive(:use_parity).and_return true
+
+      expect(connection)
+        .to receive(:parity_next_nonce)
+        .with('0x' + normalized_address)
+        .and_return 123
+
+      expect(account.next_nonce).to eq 123
+    end
+  end
+
   describe "#transfer_to" do
     let(:target_address) { '0x5e575279bf9f4acf0a130c186861454247394c06' }
     let(:amount) { 20_000_000 }
