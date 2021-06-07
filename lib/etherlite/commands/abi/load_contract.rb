@@ -81,9 +81,21 @@ module Etherlite::Abi
           )
         end,
         (_definition['outputs'] || []).map { |input| LoadType.for signature: input['type'] },
-        _definition.fetch('payable', false),
-        _definition.fetch('constant', false)
+        function_payable?(_definition),
+        function_constant?(_definition)
       )
+    end
+
+    def function_payable?(_definition)
+      return _definition['payable'] if _definition.key? 'payable'
+
+      _definition['stateMutability'] == 'payable'
+    end
+
+    def function_constant?(_definition)
+      return _definition['constant'] if _definition.key? 'constant'
+
+      _definition['stateMutability'] == 'pure' || _definition['stateMutability'] == 'view'
     end
   end
 end

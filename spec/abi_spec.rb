@@ -32,6 +32,34 @@ describe Etherlite::Abi do
             'type' => "function"
           },
           {
+            'name' => "qux_payable",
+            'inputs' => [],
+            'outputs' => [],
+            'type' => "function",
+            'stateMutability' => 'payable'
+          },
+          {
+            'type' => "function",
+            'name' => "qux_nonpayable",
+            'inputs' => [],
+            'outputs' => [],
+            'stateMutability' => 'nonpayable'
+          },
+          {
+            'type' => "function",
+            'name' => "qux_view",
+            'inputs' => [],
+            'outputs' => [],
+            'stateMutability' => 'view'
+          },
+          {
+            'type' => "function",
+            'name' => "qux_pure",
+            'inputs' => [],
+            'outputs' => [],
+            'stateMutability' => 'pure'
+          },
+          {
             'anonymous' => false,
             'inputs' => [
               { 'indexed' => true, 'name' => "id", 'type' => "uint256" },
@@ -64,17 +92,33 @@ describe Etherlite::Abi do
     end
 
     it "loads the contract's functions" do
-      expect(contract.functions.count).to eq 2
-
       expect(contract.functions.first.constant?).to be false
       expect(contract.functions.first.inputs.count).to eq 1
       expect(contract.functions.first.inputs[0].type).to be_a Etherlite::Types::Integer
       expect(contract.functions.first.outputs.count).to eq 1
       expect(contract.functions.first.outputs[0]).to be_a Etherlite::Types::String
 
+      expect(contract.functions.second.constant?).to be true
+      expect(contract.functions.second.inputs.count).to eq 2
+      expect(contract.functions.second.outputs.count).to eq 0
+    end
+
+    it "properly handles the 'stateMutability' when loading functions" do
+      expect(contract.functions.third.name).to eq 'qux_payable' 
+      expect(contract.functions.third.payable?).to be true
+      expect(contract.functions.third.constant?).to be false 
+
+      expect(contract.functions.fourth.name).to eq 'qux_nonpayable'
+      expect(contract.functions.fourth.payable?).to be false
+      expect(contract.functions.fourth.constant?).to be false
+
+      expect(contract.functions.fifth.name).to eq 'qux_view' 
+      expect(contract.functions.fifth.payable?).to be false
+      expect(contract.functions.fifth.constant?).to be true
+
+      expect(contract.functions.last.name).to eq 'qux_pure' 
+      expect(contract.functions.last.payable?).to be false
       expect(contract.functions.last.constant?).to be true
-      expect(contract.functions.last.inputs.count).to eq 2
-      expect(contract.functions.last.outputs.count).to eq 0
     end
 
     it "loads the contract's events" do
