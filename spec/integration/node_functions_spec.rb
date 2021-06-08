@@ -16,6 +16,12 @@ describe 'Test node functions against testrpc', integration: true do
     end
   end
 
+  describe "#anonymous_account" do
+    it "returns a readonly account" do
+      expect(client.anonymous_account.normalized_address).to be nil
+    end
+  end
+
   context "given a transaction" do
     let(:pk) { '5265130d78f73a53aeac4ffc0fa03f42a3d3526fee8f9af31be0807b11c5233a' }
     let(:pk_address) { '0xe8C1b5A6ac249b8f01AA042B5819607bbf06C557' }
@@ -79,6 +85,18 @@ describe 'Test node functions against testrpc', integration: true do
       tx = contract_class.deploy client: client, gas: 1000000
       tx.wait_for_block
       contract_class.at tx.contract_address, client: client
+    end
+
+    describe "#anonymous_account" do
+      let(:anon_contract) { contract_class.at(contract.address, as: client.anonymous_account) }
+
+      it "properly handles calls to constant functions" do
+        expect(anon_contract.test_uint(726261)).to eq 726261
+      end
+
+      it "fails when calling non constant functions" do
+        expect { anon_contract.test_events }.to raise_error(Etherlite::NotSupportedError)
+      end
     end
 
     describe "#get_logs" do

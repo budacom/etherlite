@@ -53,7 +53,11 @@ module Etherlite
       end
 
       def default_account
-        @default_account ||= load_default_account
+        @default_account ||= (accounts.first || anonymous_account)
+      end
+
+      def anonymous_account
+        @anonymous_account ||= Etherlite::Account::Anonymous.new(connection)
       end
 
       def account_from_pk(_pk)
@@ -66,13 +70,6 @@ use 'load_account' instead"
       end
 
       def_delegators :default_account, :unlock, :lock, :normalized_address, :transfer_to, :call
-
-      private
-
-      def load_default_account
-        # TODO: consider configuring a global PK and allow the default account to use it
-        accounts.first || Etherlite::Account::Anonymous.new(connection)
-      end
     end
   end
 end

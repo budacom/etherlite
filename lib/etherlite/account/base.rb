@@ -39,7 +39,7 @@ module Etherlite::Account
     end
 
     def send_transaction(_options = {})
-      raise NotSupportedError, 'transactions are not supported by this kind of account'
+      raise Etherlite::NotSupportedError, 'transactions are not supported by this kind of account'
     end
 
     def ==(_other)
@@ -50,7 +50,6 @@ module Etherlite::Account
 
     def call_constant(_target, _function, _params, _options)
       params = {
-        from: json_encoded_address,
         to: Etherlite::Utils.encode_address_param(_target),
         data: _function.encode(_params)
       }
