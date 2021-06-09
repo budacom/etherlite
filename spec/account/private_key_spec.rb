@@ -25,6 +25,53 @@ describe Etherlite::Account::PrivateKey do
     end
   end
 
+  describe "#build_raw_transaction" do
+    let(:target_address) { '0x5e575279bf9f4acf0a130c186861454247394c06' }
+    let(:amount) { 20_000_000 }
+    let(:gas_limit) { 100_000 }
+    let(:data) { '0xda7a' }
+
+    it "returns a Eth::Tx transaction" do
+      tx = account.build_raw_transaction(
+        to: target_address, data: data, value: amount, gas: gas_limit
+      )
+
+      expect(tx).to be_a Eth::Tx
+    end
+
+    it "signs the returned transaction" do
+      tx = account.build_raw_transaction(
+        to: target_address, data: data, value: amount, gas: gas_limit
+      )
+
+      expect(tx.signature).not_to be nil
+    end
+
+    it "sets the returned transaction nonce to the current tx_count" do
+      tx = account.build_raw_transaction(
+        to: target_address, data: data, value: amount, gas: gas_limit
+      )
+
+      expect(tx.nonce).to eq tx_count
+    end
+
+    it "sets the returned transaction nonce to the last tx nonce if replace option is passed" do
+      tx = account.build_raw_transaction(
+        to: target_address, data: data, value: amount, gas: gas_limit, replace: true
+      )
+
+      expect(tx.nonce).to eq tx_count - 1
+    end
+
+    it "sets the returned transaction nonce to the given one if nonce option is passed" do
+      tx = account.build_raw_transaction(
+        to: target_address, data: data, value: amount, gas: gas_limit, nonce: 123
+      )
+
+      expect(tx.nonce).to eq 123
+    end
+  end
+
   describe "#send_transaction" do
     let(:target_address) { '0x5e575279bf9f4acf0a130c186861454247394c06' }
     let(:amount) { 20_000_000 }
@@ -50,32 +97,6 @@ describe Etherlite::Account::PrivateKey do
 
       expect(tx).to be_a Etherlite::Transaction
       expect(tx.tx_hash).to eq 'a_hash'
-    end
-
-    it "calls 'eth_send_raw_transaction' with previous nonce if 'replace' option is given" do
-      expect(connection).to receive(:eth_send_raw_transaction) do |raw|
-        tx = Eth::Tx.decode raw
-        expect(tx.nonce).to eq tx_count - 1
-
-        'a_hash'
-      end
-
-      account.send_transaction(
-        to: target_address, data: data, value: amount, gas: gas_limit, replace: true
-      )
-    end
-
-    it "calls 'eth_send_raw_transaction' with given nonce if 'nonce' option is given" do
-      expect(connection).to receive(:eth_send_raw_transaction) do |raw|
-        tx = Eth::Tx.decode raw
-        expect(tx.nonce).to eq 123
-
-        'a_hash'
-      end
-
-      account.send_transaction(
-        to: target_address, data: data, value: amount, gas: gas_limit, nonce: 123
-      )
     end
 
     context "when use_parity flag is set to true" do

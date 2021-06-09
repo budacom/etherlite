@@ -17,16 +17,22 @@ module Etherlite
       last_nonce
     end
 
-    def with_next_nonce_for(_normalized_address, replace: false, nonce: nil)
-      @@nonce_mutex.synchronize do
-        return yield nonce if nonce.present?
+    def next_nonce_for(_normalized_address, replace: false, nonce: nil)
+      if nonce.nil?
+        nonce = last_nonce_for(_normalized_address)
+        nonce += 1 if nonce.negative? || !replace # if first tx, don't replace
+      end
 
-        next_nonce = last_nonce_for(_normalized_address)
-        next_nonce += 1 if next_nonce.negative? || !replace # if first tx, don't replace
+      nonce
+    end
+
+    def with_next_nonce_for(_normalized_address, _options = {})
+      @@nonce_mutex.synchronize do
+        nonce = next_nonce_for(_normalized_address, _options)
 
         begin
-          result = yield next_nonce
-          @@nonce_cache[_normalized_address] = next_nonce if caching_enabled?
+          result = yield nonce
+          @@nonce_cache[_normalized_address] = nonce if caching_enabled?
           return result
         rescue
           # if yield fails, cant be sure about transaction status so must rely again on observing.
