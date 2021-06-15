@@ -7,6 +7,7 @@ describe Etherlite::Transaction do
   let(:raw_tx) do
     {
       'blockNumber' => '0xFFAA',
+      'blockHash' => '0xF00',
       'gas' => '0x10',
       'gasPrice' => '0x20',
       'value' => '0x30'
@@ -49,7 +50,7 @@ describe Etherlite::Transaction do
   end
 
   describe "#gas_price"  do
-    it "returns gas_price as integer" do
+    it "returns gas price as integer" do
       expect(transaction.gas_price).to eq 32
     end
   end
@@ -61,8 +62,14 @@ describe Etherlite::Transaction do
   end
   
   describe "#block_number" do
-    it "returns block_number as integer" do
+    it "returns block number as integer" do
       expect(transaction.block_number).to eq 65450
+    end
+  end
+  
+  describe "#block_hash" do
+    it "returns block hash" do
+      expect(transaction.block_hash).to eq '0xF00'
     end
   end
 

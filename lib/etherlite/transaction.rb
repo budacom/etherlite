@@ -45,6 +45,12 @@ module Etherlite
       Utils.hex_to_uint(original['blockNumber'])
     end
 
+    def block_hash
+      return nil unless mined?
+
+      original['blockHash']
+    end
+
     def confirmations
       return 0 unless mined?
 
