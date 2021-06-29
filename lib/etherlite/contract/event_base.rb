@@ -23,6 +23,7 @@ module Etherlite::Contract
 
     def self.decode(_connection, _json)
       new(
+        _json['blockHash'],
         _json['blockNumber'].nil? ? nil : Etherlite::Utils.hex_to_uint(_json['blockNumber']),
         _json['transactionHash'],
         Etherlite::Address.new(_connection, Etherlite::Utils.normalize_address(_json['address'])),
@@ -30,9 +31,10 @@ module Etherlite::Contract
       )
     end
 
-    attr_reader :block_number, :tx_hash, :address, :attributes
+    attr_reader :block_hash, :block_number, :tx_hash, :address, :attributes
 
-    def initialize(_block_number, _tx_hash, _address, _attributes)
+    def initialize(_block_hash, _block_number, _tx_hash, _address, _attributes)
+      @block_hash = _block_hash
       @block_number = _block_number
       @tx_hash = _tx_hash
       @address = _address
