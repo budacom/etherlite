@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "keccak", "~> 1.1"
+  spec.add_dependency "keccak", "~> 1.3"
   spec.add_dependency "power-types", "~> 0.4"
   spec.add_dependency "eth", "~> 0.4"
   spec.add_dependency "activesupport", "~> 6.1"
