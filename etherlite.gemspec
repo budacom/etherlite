@@ -19,16 +19,16 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "digest-sha3", "~> 1.1"
-  spec.add_dependency "power-types", "~> 0.1"
-  spec.add_dependency "eth", "~> 0.4.4"
-  spec.add_dependency "activesupport"
+  spec.add_dependency "keccak", "~> 1.1"
+  spec.add_dependency "power-types", "~> 0.4"
+  spec.add_dependency "eth", "~> 0.4"
+  spec.add_dependency "activesupport", "~> 6.1"
 
-  spec.add_development_dependency "bundler", "~> 2.1.4"
-  spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency "guard", "~> 2.14"
+  spec.add_development_dependency "bundler", "~> 2.2"
+  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "rspec", "~> 3.10"
+  spec.add_development_dependency "guard", "~> 2.18"
   spec.add_development_dependency "guard-rspec", "~> 4.7"
-  spec.add_development_dependency "webmock", "~> 3.7.5"
-  spec.add_development_dependency "pry"
+  spec.add_development_dependency "webmock", "~> 3.14"
+  spec.add_development_dependency "pry", "~> 0.14"
 end

@@ -4,8 +4,8 @@ module Etherlite
   module Utils
     extend self
 
-    def sha3(_data)
-      Digest::SHA3.hexdigest(_data, 256)
+    def keccak(_data)
+      Digest::Keccak.hexdigest(_data, 256)
     end
 
     def uint_to_hex(_value, bytes: 32)

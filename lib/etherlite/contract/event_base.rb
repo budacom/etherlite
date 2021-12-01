@@ -18,7 +18,7 @@ module Etherlite::Contract
     end
 
     def self.topic
-      '0x' + Etherlite::Utils.sha3(signature)
+      '0x' + Etherlite::Utils.keccak(signature)
     end
 
     def self.decode(_connection, _json)

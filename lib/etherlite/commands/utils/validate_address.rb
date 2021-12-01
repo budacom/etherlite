@@ -12,7 +12,7 @@ module Etherlite::Utils
 
     def valid_checksum?
       trimmed_address = @address.gsub(/^0x/, '')
-      address_hash = Etherlite::Utils.sha3 trimmed_address.downcase
+      address_hash = Etherlite::Utils.keccak trimmed_address.downcase
 
       trimmed_address.chars.each_with_index do |c, i|
         hash_byte = address_hash[i].to_i(16)
