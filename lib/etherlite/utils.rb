@@ -5,7 +5,7 @@ module Etherlite
     extend self
 
     def sha3(_data)
-      Digest::SHA3.hexdigest(_data, 256)
+      Digest::Keccak.hexdigest(_data, 256)
     end
 
     def uint_to_hex(_value, bytes: 32)
@@ -13,7 +13,7 @@ module Etherlite
     end
 
     def int_to_hex(_value, bytes: 32)
-      if _value < 0
+      if _value.negative?
         # 2's complement for negative values
         (_value & ((1 << bytes * 8) - 1)).to_s(16)
       else
@@ -28,7 +28,7 @@ module Etherlite
     def hex_to_int(_hex_value, bytes: 32)
       value = _hex_value.hex
       top_bit = (1 << (bytes * 8 - 1))
-      value & top_bit > 0 ? (value - 2 * top_bit) : value
+      (value & top_bit).positive? ? (value - 2 * top_bit) : value
     end
 
     def valid_address?(_address)
@@ -45,21 +45,23 @@ module Etherlite
       else
         _value = _value.to_s
         raise ArgumentError, 'invalid address' unless valid_address? _value
+
         normalize_address _value
       end
     end
 
     def encode_address_param(_value)
-      '0x' + normalize_address_param(_value)
+      "0x#{normalize_address_param(_value)}"
     end
 
     def encode_block_param(_value)
       return _value.to_s if ['pending', 'earliest', 'latest'].include?(_value.to_s)
-      '0x' + _value.to_s(16)
+
+      "0x#{_value.to_s(16)}"
     end
 
     def encode_quantity_param(_value)
-      '0x' + _value.to_s(16)
+      "0x#{_value.to_s(16)}"
     end
   end
 end
