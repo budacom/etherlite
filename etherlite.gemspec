@@ -6,11 +6,11 @@ Gem::Specification.new do |spec|
   spec.name          = "etherlite"
   spec.version       = Etherlite::VERSION
   spec.authors       = ["Ignacio Baixas"]
-  spec.email         = ["ignacio@surbtc.com"]
+  spec.email         = ["ignacio@budacom.com"]
 
   spec.summary       = 'Ethereum integration for ruby on rails'
   spec.description   = ''
-  spec.homepage      = "https://github.com/SurBTC/etherlite"
+  spec.homepage      = "https://github.com/budacom/etherlite"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'keccak', '~> 1.3', '>= 1.3.1'
   spec.add_dependency "power-types", "~> 0.1"
 
-  spec.add_development_dependency "bundler", "~> 2.1.4"
+  spec.add_development_dependency "bundler", "~> 2.1"
   spec.add_development_dependency "guard", "~> 2.14"
   spec.add_development_dependency "guard-rspec", "~> 4.7"
   spec.add_development_dependency "pry"
