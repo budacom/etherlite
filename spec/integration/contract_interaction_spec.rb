@@ -46,7 +46,7 @@ describe 'Test contract interaction', integration: true do
       last_log = contract.get_logs.last
       expect(last_log).to be_a contract_class::TestEvent
       expect(last_log.tx_hash).to eq tx.tx_hash
-      expect(last_log.address.address).to eq contract.address
+      expect(last_log.address.to_s).to eq contract.address
       expect(last_log.int_param).to eq -10
       expect(last_log.uint_param).to eq 30
       expect(last_log.string_param).to eq 'foo'
