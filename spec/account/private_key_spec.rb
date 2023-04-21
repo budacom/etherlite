@@ -15,64 +15,64 @@ describe Etherlite::Account::PrivateKey do
     allow(connection).to receive(:use_parity).and_return false
     allow(connection).to receive(:eth_gas_price).and_return gas_price
     allow(connection).to receive(:eth_get_transaction_count)
-      .with('0x' + pk_address, 'pending').and_return tx_count
+      .with("0x#{pk_address}", 'pending').and_return tx_count
     allow(connection).to receive(:eth_send_raw_transaction).and_return 'foo'
   end
 
-  describe "#normalized_address" do
-    it "returns the address corresponding to the given PK" do
+  describe '#normalized_address' do
+    it 'returns the address corresponding to the given PK' do
       expect(account.normalized_address).to eq pk_address
     end
   end
 
-  describe "#build_raw_transaction" do
+  describe '#build_raw_transaction' do
     let(:target_address) { '0x5e575279bf9f4acf0a130c186861454247394c06' }
     let(:amount) { 20_000_000 }
     let(:gas_limit) { 100_000 }
     let(:data) { '0xda7a' }
 
-    it "returns a Eth::Tx transaction" do
+    it 'returns a Eth::Tx::Legacy transaction' do
       tx = account.build_raw_transaction(
         to: target_address, data: data, value: amount, gas: gas_limit
       )
 
-      expect(tx).to be_a Eth::Tx
+      expect(tx).to be_a Eth::Tx::Legacy
     end
 
-    it "signs the returned transaction" do
+    it 'signs the returned transaction' do
       tx = account.build_raw_transaction(
         to: target_address, data: data, value: amount, gas: gas_limit
       )
 
-      expect(tx.signature).not_to be nil
+      expect(Eth::Tx.signed?(tx)).to be true
     end
 
-    it "sets the returned transaction nonce to the current tx_count" do
+    it 'sets the returned transaction nonce to the current tx_count' do
       tx = account.build_raw_transaction(
         to: target_address, data: data, value: amount, gas: gas_limit
       )
 
-      expect(tx.nonce).to eq tx_count
+      expect(tx.signer_nonce).to eq tx_count
     end
 
-    it "sets the returned transaction nonce to the last tx nonce if replace option is passed" do
+    it 'sets the returned transaction nonce to the last tx nonce if replace option is passed' do
       tx = account.build_raw_transaction(
         to: target_address, data: data, value: amount, gas: gas_limit, replace: true
       )
 
-      expect(tx.nonce).to eq tx_count - 1
+      expect(tx.signer_nonce).to eq tx_count - 1
     end
 
-    it "sets the returned transaction nonce to the given one if nonce option is passed" do
+    it 'sets the returned transaction nonce to the given one if nonce option is passed' do
       tx = account.build_raw_transaction(
         to: target_address, data: data, value: amount, gas: gas_limit, nonce: 123
       )
 
-      expect(tx.nonce).to eq 123
+      expect(tx.signer_nonce).to eq 123
     end
   end
 
-  describe "#send_transaction" do
+  describe '#send_transaction' do
     let(:target_address) { '0x5e575279bf9f4acf0a130c186861454247394c06' }
     let(:amount) { 20_000_000 }
     let(:gas_limit) { 100_000 }
@@ -81,12 +81,12 @@ describe Etherlite::Account::PrivateKey do
     it "calls 'eth_send_raw_transaction' with function data and returns a Transaction" do
       expect(connection).to receive(:eth_send_raw_transaction) do |raw|
         tx = Eth::Tx.decode raw
-        expect(tx.value).to eq amount
-        expect(tx.data).to eq data
+        expect(tx.amount).to eq amount
+        expect("0x#{tx.destination}").to eq target_address
         expect(tx.gas_limit).to eq gas_limit
         expect(tx.gas_price).to eq gas_price
-        expect(binary_to_hex(tx.to)).to eq target_address
-        expect(tx.nonce).to eq tx_count
+        expect(binary_to_hex(tx.payload)).to eq data
+        expect(tx.signer_nonce).to eq tx_count
 
         'a_hash'
       end
@@ -99,13 +99,13 @@ describe Etherlite::Account::PrivateKey do
       expect(tx.tx_hash).to eq 'a_hash'
     end
 
-    context "when use_parity flag is set to true" do
+    context 'when use_parity flag is set to true' do
       before do
         allow(connection).to receive(:use_parity).and_return true
       end
 
-      it "calls parity_next_nonce instead of eth_get_transaction_count" do
-        expect(connection).to receive(:parity_next_nonce).with('0x' + pk_address).and_return 2
+      it 'calls parity_next_nonce instead of eth_get_transaction_count' do
+        expect(connection).to receive(:parity_next_nonce).with("0x#{pk_address}").and_return 2
         expect(connection).not_to receive(:eth_get_transaction_count)
 
         account.send_transaction(
@@ -116,6 +116,6 @@ describe Etherlite::Account::PrivateKey do
   end
 
   def binary_to_hex(_string)
-    '0x' + _string.unpack('H*').first
+    "0x#{_string.unpack1('H*')}"
   end
 end

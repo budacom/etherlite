@@ -60,15 +60,6 @@ module Etherlite
         @anonymous_account ||= Etherlite::Account::Anonymous.new(connection)
       end
 
-      def account_from_pk(_pk)
-        Etherlite.logger.warn(
-          "use of 'account_from_pk' is deprecated and will be removed in next version, \
-use 'load_account' instead"
-        )
-
-        load_account(from_pk: _pk)
-      end
-
       def_delegators :default_account, :unlock, :lock, :normalized_address, :transfer_to, :call
     end
   end

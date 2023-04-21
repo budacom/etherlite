@@ -3,7 +3,7 @@ module Etherlite
     include Api::Rpc
     include Api::ParityRpc
 
-    attr_reader :chain_id, :use_parity
+    attr_reader :uri, :chain_id, :use_parity
 
     def initialize(_uri, _options = {})
       @uri = _uri

@@ -5,13 +5,14 @@ module Etherlite
     class PrivateKey < Base
       def initialize(_connection, _pk)
         @key = Eth::Key.new priv: _pk
-        super _connection, Etherlite::Utils.normalize_address(@key.address)
+        super _connection, Etherlite::Utils.normalize_address(@key.address.to_s)
       end
 
       def build_raw_transaction(_options = {})
         nonce = nonce_manager.next_nonce_for(normalized_address, _options.slice(:replace, :nonce))
 
         tx = Eth::Tx.new(
+          chain_id: @connection.chain_id,
           value: _options.fetch(:value, 0),
           data: _options.fetch(:data, ''),
           gas_limit: _options.fetch(:gas, 90_000),
@@ -20,22 +21,19 @@ module Etherlite
           nonce: nonce
         )
 
-        sign_with_connection_chain tx
-
+        tx.sign @key
         tx
       end
 
       def send_transaction(_options = {})
         tx = build_raw_transaction(_options)
 
-        nonce_manager.with_next_nonce_for(normalized_address, nonce: tx.nonce) do |nonce|
-          Etherlite::Transaction.new @connection, @connection.eth_send_raw_transaction(tx.hex)
+        nonce_manager.with_next_nonce_for(normalized_address, nonce: tx.signer_nonce) do |_|
+          Etherlite::Transaction.new @connection, @connection.eth_send_raw_transaction("0x#{tx.hex}")
         end
       end
 
       private
-
-      @@eth_mutex = Mutex.new
 
       def gas_price
         # TODO: improve on this
@@ -44,13 +42,6 @@ module Etherlite
 
       def nonce_manager
         Etherlite::NonceManager.new @connection
-      end
-
-      def sign_with_connection_chain(_tx)
-        @@eth_mutex.synchronize do
-          Eth.configure { |c| c.chain_id = @connection.chain_id }
-          _tx.sign @key
-        end
       end
     end
   end

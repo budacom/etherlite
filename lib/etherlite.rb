@@ -56,7 +56,7 @@ module Etherlite
     _url = URI(_url) unless _url.is_a? URI
 
     options = config.default_connection_options
-    options = options.merge _options.slice options.keys
+    options = options.merge _options.slice(*options.keys)
 
     Client.new Connection.new(_url, options)
   end
