@@ -1,0 +1,35 @@
+name: Pull Request Tests
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      ganache:
+        image: trufflesuite/ganache-cli:v6.12.2
+        ports:
+          - 8545:8545
+        options: >-
+          --health-cmd "nc -zv 127.0.0.1 8545"
+          --health-interval 5s
+          --health-timeout 10s
+          --health-retries 10
+
+    env:
+      GANACHE_HOST: 127.0.0.1
+      GANACHE_PORT: 8545
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: '2.7'
+        rubygems: '3.3.22'
+        bundler-cache: true
+
+    - name: Run tests
+      run: bundle exec rspec

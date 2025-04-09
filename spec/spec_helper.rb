@@ -6,7 +6,11 @@ require 'webmock/rspec'
 
 module SpecExtensions
   extend RSpec::SharedContext
-  let(:client) { Etherlite.connect 'http://localhost:8565' }
+  let(:client) do
+    host = ENV.fetch('GANACHE_HOST', 'localhost')
+    port = ENV.fetch('GANACHE_PORT', '8545')
+    Etherlite.connect "http://#{host}:#{port}"
+  end
 
   around(:each) do |example|
     if example.metadata[:integration]
