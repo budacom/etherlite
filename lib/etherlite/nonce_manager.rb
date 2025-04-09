@@ -28,7 +28,7 @@ module Etherlite
 
     def with_next_nonce_for(_normalized_address, _options = {})
       @@nonce_mutex.synchronize do
-        nonce = next_nonce_for(_normalized_address, _options)
+        nonce = next_nonce_for(_normalized_address, **_options)
 
         begin
           result = yield nonce
