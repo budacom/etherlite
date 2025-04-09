@@ -1,0 +1,10 @@
+services:
+  ganache:
+    image: trufflesuite/ganache-cli:v6.12.2
+    ports:
+      - 8545:8545
+    healthcheck:
+      test: nc -zv 127.0.0.1 8545
+      interval: 5s
+      timeout: 10s
+      retries: 10
