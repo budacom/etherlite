@@ -30,7 +30,7 @@ module Etherlite
 
       def send_transaction_with_passphrase(_params, _passphrase)
         if _passphrase.nil?
-          @connection.eth_send_transaction _params
+          @connection.eth_send_transaction **_params
         else
           @connection.personal_send_transaction _params, _passphrase
         end

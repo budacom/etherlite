@@ -9,7 +9,7 @@ module Etherlite
       end
 
       def build_raw_transaction(_options = {})
-        nonce = nonce_manager.next_nonce_for(normalized_address, _options.slice(:replace, :nonce))
+        nonce = nonce_manager.next_nonce_for(normalized_address, **_options.slice(:replace, :nonce))
 
         tx = Eth::Tx.new(
           chain_id: @connection.chain_id,
