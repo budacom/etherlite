@@ -45,6 +45,7 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         rubygems: ${{ matrix.rubygems || '' }}
+        bundler: latest
         bundler-cache: true
         cache-version: 1
 
