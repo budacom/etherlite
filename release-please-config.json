@@ -1,7 +1,14 @@
 {
   "packages": {
     ".": {
-      "release-type": "ruby"
+      "changelog-path": "CHANGELOG.md",
+      "release-type": "ruby",
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": false,
+      "draft": false,
+      "prerelease": false,
+      "package-name": "etherlite",
+      "bootstrap-sha": "10410bb6f49e59fa0a84b2787547dc67d4bb218a"
     }
   },
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
